@@ -147,24 +147,94 @@ class StaffProfileSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", None)
 
+        # Special case:
+        # If admin is only activating/deactivating the staff member,
+        # update only the active status.
+        #
+        # This prevents unrelated legacy DOB/qualification values
+        # from blocking an account-status change.
+        if (
+            set(validated_data.keys()) == {"is_active"}
+            and user_data is None
+        ):
+            new_status = validated_data["is_active"]
+
+            StaffProfile.objects.filter(
+                pk=instance.pk
+            ).update(
+                is_active=new_status
+            )
+
+            User.objects.filter(
+                pk=instance.user_id
+            ).update(
+                is_active=new_status
+            )
+
+            instance.is_active = new_status
+
+            return instance
+
+        # Update nested Django User fields when supplied.
         if user_data:
-            UserSerializer().update(instance.user, user_data)
+            UserSerializer().update(
+                instance.user,
+                user_data
+            )
 
-        dob = validated_data.get("date_of_birth", instance.date_of_birth)
-        role = validated_data.get("role", instance.role)
+        # Validate age when DOB or role is actually being changed.
+        if (
+            "date_of_birth" in validated_data
+            or "role" in validated_data
+        ):
+            dob = validated_data.get(
+                "date_of_birth",
+                instance.date_of_birth
+            )
 
-        if dob and calculate_age(dob) < ROLE_MIN_AGE.get(role, 21):
-            raise serializers.ValidationError({
-                "date_of_birth": f"{role} must be at least {ROLE_MIN_AGE.get(role, 21)} years old."
-            })
+            role = validated_data.get(
+                "role",
+                instance.role
+            )
 
-        qualification = validated_data.get("qualification", instance.qualification)
-        validate_qualification_for_role(role, qualification)
+            if (
+                dob
+                and calculate_age(dob)
+                < ROLE_MIN_AGE.get(role, 21)
+            ):
+                raise serializers.ValidationError({
+                    "date_of_birth":
+                        f"{role} must be at least "
+                        f"{ROLE_MIN_AGE.get(role, 21)} "
+                        "years old."
+                })
+
+        # Validate qualification when qualification
+        # or role is actually being changed.
+        if (
+            "qualification" in validated_data
+            or "role" in validated_data
+        ):
+            role = validated_data.get(
+                "role",
+                instance.role
+            )
+
+            qualification = validated_data.get(
+                "qualification",
+                instance.qualification
+            )
+
+            validate_qualification_for_role(
+                role,
+                qualification
+            )
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
         instance.save()
+
         return instance
 
 
