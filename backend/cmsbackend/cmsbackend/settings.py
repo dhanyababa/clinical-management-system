@@ -29,8 +29,11 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 
 DEBUG = os.getenv("DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
-
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "cms-portfolio-backend.onrender.com",
+]
 # ------------------------------
 # APPLICATIONS
 # ------------------------------
@@ -61,8 +64,9 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # ------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # MUST be first
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -70,7 +74,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 # ------------------------------
 # URLS & WSGI
 # ------------------------------
@@ -106,6 +109,11 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '3306'),
+        'OPTIONS': (
+            {'ssl': {'ca': os.getenv('DB_SSL_CA')}}
+            if os.getenv('DB_SSL_CA')
+            else ({'ssl': {}} if not DEBUG else {})
+        ),
     }
 }
 
@@ -141,6 +149,11 @@ USE_TZ = True
 # ------------------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -195,5 +208,7 @@ CORS_ALLOW_CREDENTIALS = True
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False   # Must be False so the frontend JS can read it
 
-SESSION_COOKIE_SECURE = False  # Set True in production (HTTPS)
-CSRF_COOKIE_SECURE = False     # Set True in production (HTTPS)
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
