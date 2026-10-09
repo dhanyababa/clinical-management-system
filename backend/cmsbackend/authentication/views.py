@@ -10,12 +10,16 @@ from rest_framework.views import APIView
 from .serializers import CustomTokenObtainPairSerializer, LoginActivitySerializer
 from .models import LoginActivity
 from .utils import get_client_ip
-
+from django.conf import settings
 
 # ─── Cookie config ────────────────────────────────────────────────
 ACCESS_COOKIE  = "access_token"
 REFRESH_COOKIE = "refresh_token"
-COOKIE_OPTS = dict(httponly=True, secure=False, samesite="Lax")
+COOKIE_OPTS = dict(
+    httponly=True,
+    secure=not settings.DEBUG,
+    samesite="None" if not settings.DEBUG else "Lax",
+)
 # Set secure=True in production (HTTPS). False here for local dev.
 
 # FIX 3: Lifetimes must match SIMPLE_JWT settings exactly.
@@ -31,8 +35,14 @@ def _set_auth_cookies(response, access, refresh):
 
 
 def _clear_auth_cookies(response):
-    response.delete_cookie(ACCESS_COOKIE)
-    response.delete_cookie(REFRESH_COOKIE)
+    response.delete_cookie(
+        ACCESS_COOKIE,
+        samesite=COOKIE_OPTS["samesite"],
+    )
+    response.delete_cookie(
+        REFRESH_COOKIE,
+        samesite=COOKIE_OPTS["samesite"],
+    )
 
 
 # ─── LOGIN ────────────────────────────────────────────────────────
