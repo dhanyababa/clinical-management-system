@@ -1,225 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import { useNavigate, useParams } from "react-router-dom";
-// import PharmacistLayout from "../components/PharmacistLayout";
-// import { getMedicineBillDetail } from "../api/pharmacistApi";
-
-// const PrintBillPage = () => {
-//   const { billId } = useParams();
-//   const navigate = useNavigate();
-
-//   const [bill, setBill] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-
-//   useEffect(() => {
-//     const loadBill = async () => {
-//       try {
-//         const res = await getMedicineBillDetail(billId);
-//         setBill(res.data || res);
-//       } catch {
-//         setError("Failed to load bill.");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     loadBill();
-//   }, [billId]);
-
-//   const handlePrint = () => {
-//     window.print();
-//   };
-
-//   if (loading) {
-//     return (
-//       <PharmacistLayout title="Print Bill">
-//         <div className="text-gray-400 py-10 text-center">Loading bill...</div>
-//       </PharmacistLayout>
-//     );
-//   }
-
-//   if (error || !bill) {
-//     return (
-//       <PharmacistLayout title="Print Bill">
-//         <div className="text-red-400 py-10 text-center">
-//           {error || "Bill not found."}
-//         </div>
-//       </PharmacistLayout>
-//     );
-//   }
-
-//   return (
-//     <>
-//     {/* <PharmacistLayout title="Print Bill"> */}
-//       <div className="print:hidden flex items-center justify-between mb-6">
-//         <button
-//           onClick={() => navigate("/pharmacist/bills")}
-//           className="text-sm text-gray-400 hover:text-white"
-//         >
-//           ← Back to Bills
-//         </button>
-
-//         <button
-//           onClick={handlePrint}
-//           className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-xl transition"
-//         >
-//           Print / Save PDF
-//         </button>
-//       </div>
-
-//       <div className="max-w-5xl mx-auto bg-white text-black rounded-xl shadow print:shadow-none print:rounded-none">
-//         <div className="p-8">
-//           <div className="border-b pb-4 mb-6 text-center">
-//             {/* <h1 className="text-2xl font-bold">Clinic Pharmacy Bill</h1> */}
-//            <h1 className="text-xl font-bold mb-2 text-center">
-//                 Clinic Pharmacy Bill
-//                 </h1>
-
-//                 {bill.payment_status === "Pending" && (
-//                 <p className="text-center text-red-600 font-semibold mb-4">
-//                     ⚠ UNPAID BILL
-//                 </p>
-//                 )}
-  
-//             <p className="text-sm text-gray-600">Patient Copy</p>
-//           </div>
-
-//           <div className="grid grid-cols-2 gap-6 mb-6 text-sm">
-//             <div className="space-y-1">
-//               <p><span className="font-semibold">Bill No:</span> #{bill.bill_id}</p>
-//               <p><span className="font-semibold">Prescription Code:</span> {bill.prescription_code || "—"}</p>
-//               <p>
-//                 <span className="font-semibold">Bill Date:</span>{" "}
-//                 {bill.created_at ? new Date(bill.created_at).toLocaleDateString("en-IN") : "—"}
-//               </p>
-//               <p>
-//                 <span className="font-semibold">Dispense Date:</span>{" "}
-//                 {bill.dispense_date ? new Date(bill.dispense_date).toLocaleDateString("en-IN") : "—"}
-//               </p>
-//             </div>
-
-//             <div className="space-y-1">
-//               <p>
-//                 <span className="font-semibold">Patient:</span>{" "}
-//                 {bill.patient_details?.full_name || "—"}
-//               </p>
-//               <p>
-//                 <span className="font-semibold">Doctor:</span>{" "}
-//                 {bill.doctor_name || "—"}
-//               </p>
-//               <p>
-//                 <span className="font-semibold">Payment Status:</span>{" "}
-//                 <span className={bill.payment_status === "Paid" ? "text-green-700 font-semibold" : "text-yellow-700 font-semibold"}>
-//                   {bill.payment_status}
-//                 </span>
-//               </p>
-//             </div>
-//           </div>
-
-//           {bill.bill_note ? (
-//             <div className="mb-5 border border-yellow-400 bg-yellow-50 text-yellow-800 rounded-lg px-4 py-3 text-sm">
-//               {bill.bill_note}
-//             </div>
-//           ) : null}
-
-//           <div className="overflow-x-auto mb-6">
-//             <table className="w-full border border-gray-300 text-sm">
-//               <thead>
-//                 <tr className="bg-gray-100">
-//                   <th className="border px-3 py-2 text-left">Medicine</th>
-//                   <th className="border px-3 py-2 text-left">Dosage</th>
-//                   <th className="border px-3 py-2 text-left">Instructions</th>
-//                   <th className="border px-3 py-2 text-center">Prescribed</th>
-//                   <th className="border px-3 py-2 text-center">Given</th>
-//                   <th className="border px-3 py-2 text-center">Remaining</th>
-//                   <th className="border px-3 py-2 text-right">Unit Price</th>
-//                   <th className="border px-3 py-2 text-right">Line Total</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {bill.items?.length ? (
-//                   bill.items.map((item, index) => (
-//                     <tr key={index} className="align-top">
-//                       <td className="border px-3 py-2">
-//                         <p className="font-medium">{item.medicine_name}</p>
-//                         {item.batch_numbers?.length ? (
-//                           <p className="text-xs text-gray-500 mt-1">
-//                             Batch: {item.batch_numbers.join(", ")}
-//                           </p>
-//                         ) : null}
-//                         {item.is_partial ? (
-//                           <p className="text-xs text-red-600 mt-1 font-medium">
-//                             Partial Dispense
-//                           </p>
-//                         ) : null}
-//                       </td>
-
-//                       <td className="border px-3 py-2">{item.dosage || "—"}</td>
-//                       <td className="border px-3 py-2">{item.instructions || "—"}</td>
-//                       <td className="border px-3 py-2 text-center">{item.prescribed_quantity}</td>
-//                       <td className="border px-3 py-2 text-center">{item.dispensed_quantity}</td>
-//                       <td className="border px-3 py-2 text-center">{item.remaining_quantity}</td>
-//                       <td className="border px-3 py-2 text-right">
-//                         ₹{parseFloat(item.unit_price || 0).toFixed(2)}
-//                       </td>
-//                       <td className="border px-3 py-2 text-right">
-//                         ₹{parseFloat(item.line_total || 0).toFixed(2)}
-//                       </td>
-//                     </tr>
-//                   ))
-//                 ) : (
-//                   <tr>
-//                     <td colSpan={8} className="border px-3 py-6 text-center text-gray-500">
-//                       No items found.
-//                     </td>
-//                   </tr>
-//                 )}
-//               </tbody>
-//             </table>
-//           </div>
-
-//           {bill.items?.some((item) => item.is_partial) ? (
-//             <div className="mb-6">
-//               <h3 className="font-semibold text-red-700 mb-2">Important Note</h3>
-//               <div className="space-y-2">
-//                 {bill.items
-//                   .filter((item) => item.is_partial)
-//                   .map((item, index) => (
-//                     <p key={index} className="text-sm text-red-700">
-//                       • {item.note}
-//                     </p>
-//                   ))}
-//               </div>
-//             </div>
-//           ) : null}
-
-//           <div className="ml-auto w-full max-w-sm border-t pt-4 space-y-2 text-sm">
-//             <div className="flex justify-between">
-//               <span>Subtotal</span>
-//               <span>₹{parseFloat(bill.total_amount || 0).toFixed(2)}</span>
-//             </div>
-//             <div className="flex justify-between">
-//               <span>Discount</span>
-//               <span>₹{parseFloat(bill.discount || 0).toFixed(2)}</span>
-//             </div>
-//             <div className="flex justify-between font-bold text-lg border-t pt-2">
-//               <span>Final Amount</span>
-//               <span>₹{parseFloat(bill.final_amount || 0).toFixed(2)}</span>
-//             </div>
-//           </div>
-
-//           <div className="mt-10 text-center text-xs text-gray-500">
-//             Thank you. Please keep this bill for your records.
-//           </div>
-//         </div>
-//       </div>
-//     {/* </PharmacistLayout> */}
-//     </>
-//   );
-// };
-
-// export default PrintBillPage;
-
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PharmacistLayout from "../components/PharmacistLayout";
@@ -255,7 +33,9 @@ const PrintBillPage = () => {
   if (loading) {
     return (
       <PharmacistLayout title="Print Bill">
-        <div className="text-gray-600 py-12 text-center text-lg">Loading bill...</div>
+        <div className="py-16 text-center text-sm text-gray-400 sm:text-lg">
+          Loading bill...
+        </div>
       </PharmacistLayout>
     );
   }
@@ -263,7 +43,7 @@ const PrintBillPage = () => {
   if (error || !bill) {
     return (
       <PharmacistLayout title="Print Bill">
-        <div className="text-red-700 py-12 text-center text-lg">
+        <div className="px-4 py-16 text-center text-sm text-red-400 sm:text-lg">
           {error || "Bill not found."}
         </div>
       </PharmacistLayout>
@@ -271,74 +51,243 @@ const PrintBillPage = () => {
   }
 
   return (
-    <>
-      <div className="print:hidden flex items-center justify-between mb-6">
+    <div className="min-h-screen bg-[#060d1a] px-3 py-5 sm:px-6 sm:py-8 print:min-h-0 print:bg-white print:p-0">
+
+      {/* PRINT-SPECIFIC STYLES */}
+      <style>
+        {`
+          @media print {
+            @page {
+              size: A4 landscape;
+              margin: 10mm;
+            }
+
+            html,
+            body,
+            #root {
+              background: white !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              width: 100% !important;
+              min-width: 0 !important;
+              overflow: visible !important;
+            }
+
+            body * {
+              visibility: hidden !important;
+            }
+
+            #pharmacy-print-bill,
+            #pharmacy-print-bill * {
+              visibility: visible !important;
+            }
+
+            #pharmacy-print-bill {
+              position: absolute !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              max-width: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              border: none !important;
+              border-radius: 0 !important;
+              box-shadow: none !important;
+              background: white !important;
+              color: black !important;
+            }
+
+            #pharmacy-print-bill .bill-scroll {
+              overflow: visible !important;
+              width: 100% !important;
+            }
+
+            #pharmacy-print-bill .bill-table {
+              width: 100% !important;
+              min-width: 0 !important;
+              table-layout: fixed !important;
+              font-size: 9px !important;
+              border-collapse: collapse !important;
+            }
+
+            #pharmacy-print-bill .bill-table th,
+            #pharmacy-print-bill .bill-table td {
+              padding: 6px 5px !important;
+              overflow-wrap: anywhere !important;
+              word-break: normal !important;
+            }
+
+            #pharmacy-print-bill .bill-table th:nth-child(1) {
+              width: 17%;
+            }
+
+            #pharmacy-print-bill .bill-table th:nth-child(2) {
+              width: 10%;
+            }
+
+            #pharmacy-print-bill .bill-table th:nth-child(3) {
+              width: 21%;
+            }
+
+            #pharmacy-print-bill .bill-table th:nth-child(4),
+            #pharmacy-print-bill .bill-table th:nth-child(5),
+            #pharmacy-print-bill .bill-table th:nth-child(6) {
+              width: 8%;
+            }
+
+            #pharmacy-print-bill .bill-table th:nth-child(7),
+            #pharmacy-print-bill .bill-table th:nth-child(8) {
+              width: 10%;
+            }
+
+            #pharmacy-print-bill .bill-table thead {
+              display: table-header-group;
+            }
+
+            #pharmacy-print-bill .bill-table tr {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+
+            #pharmacy-print-bill .bill-table td,
+            #pharmacy-print-bill .bill-table th {
+              border-color: #d1d5db !important;
+            }
+
+            #pharmacy-print-bill .bill-content {
+              padding: 0 !important;
+            }
+
+            #pharmacy-print-bill .bill-summary {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+
+            #pharmacy-print-bill .bill-footer {
+              break-inside: avoid;
+              page-break-inside: avoid;
+            }
+
+            .print-actions {
+              display: none !important;
+            }
+          }
+        `}
+      </style>
+
+      {/* ===================================== */}
+      {/* SCREEN ACTIONS */}
+      {/* ===================================== */}
+
+      <div className="print-actions mx-auto mb-6 flex w-full max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button
+          type="button"
           onClick={() => navigate("/pharmacist/bills")}
-          className="text-base text-gray-600 hover:text-gray-900 transition"
+          className="flex w-full items-center justify-center rounded-xl border border-[#26344c] bg-[#0d1629] px-4 py-3 text-sm text-gray-300 transition hover:bg-[#111d35] hover:text-white sm:w-auto sm:text-base"
         >
           ← Back to Bills
         </button>
 
         <button
+          type="button"
           onClick={handlePrint}
-          className="bg-[#16a34a] hover:bg-[#15803d] text-white text-base font-semibold px-5 py-2.5 rounded-xl transition"
+          className="w-full rounded-xl bg-red-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-400 sm:w-auto sm:text-base"
         >
           Print / Save PDF
         </button>
       </div>
 
-      <div className="max-w-5xl mx-auto bg-white text-gray-900 rounded-2xl shadow-sm border-2 border-[#86c8a3] print:shadow-none print:rounded-none print:border print:border-gray-300">
-        <div className="p-8">
-          <div className="border-b border-[#a7d8bb] pb-5 mb-6 text-center">
-            <h1 className="text-2xl font-bold mb-2 text-center">Clinic Pharmacy Bill</h1>
+      {/* ===================================== */}
+      {/* PRINTABLE BILL */}
+      {/* ===================================== */}
+
+      <div
+        id="pharmacy-print-bill"
+        className="mx-auto w-full max-w-5xl overflow-hidden rounded-xl border border-[#d1d5db] bg-white text-gray-900 shadow-xl print:overflow-visible print:rounded-none print:border-0 print:shadow-none"
+      >
+        <div className="bill-content p-4 sm:p-6 lg:p-8">
+
+          {/* BILL HEADER */}
+
+          <div className="mb-6 border-b border-gray-300 pb-5 text-center">
+            <h1 className="mb-2 text-xl font-bold text-gray-900 sm:text-2xl">
+              Clinic Pharmacy Bill
+            </h1>
 
             {bill.payment_status === "Pending" && (
-              <p className="text-center text-red-600 font-semibold text-base mb-4">
+              <p className="mb-4 text-sm font-semibold text-red-600 sm:text-base">
                 ⚠ UNPAID BILL
               </p>
             )}
 
-            <p className="text-base text-gray-600">Patient Copy</p>
+            <p className="text-sm text-gray-600 sm:text-base">
+              Patient Copy
+            </p>
           </div>
 
-          <div className="grid grid-cols-2 gap-6 mb-6 text-base">
-            <div className="space-y-2">
-              <p>
-                <span className="font-semibold">Bill No:</span> #{bill.bill_id}
+          {/* ===================================== */}
+          {/* BILL AND PATIENT DETAILS */}
+          {/* ===================================== */}
+
+          <div className="mb-6 grid grid-cols-1 gap-5 text-sm sm:grid-cols-2 sm:gap-6 sm:text-base print:grid-cols-2">
+            <div className="min-w-0 space-y-2">
+              <p className="break-words">
+                <span className="font-semibold">
+                  Bill No:
+                </span>{" "}
+                #{bill.bill_id}
               </p>
-              <p>
-                <span className="font-semibold">Prescription Code:</span>{" "}
+
+              <p className="break-words">
+                <span className="font-semibold">
+                  Prescription Code:
+                </span>{" "}
                 {bill.prescription_code || "—"}
               </p>
-              <p>
-                <span className="font-semibold">Bill Date:</span>{" "}
-                {bill.created_at ? new Date(bill.created_at).toLocaleDateString("en-IN") : "—"}
+
+              <p className="break-words">
+                <span className="font-semibold">
+                  Bill Date:
+                </span>{" "}
+                {bill.created_at
+                  ? new Date(bill.created_at).toLocaleDateString("en-IN")
+                  : "—"}
               </p>
-              <p>
-                <span className="font-semibold">Dispense Date:</span>{" "}
+
+              <p className="break-words">
+                <span className="font-semibold">
+                  Dispense Date:
+                </span>{" "}
                 {bill.dispense_date
                   ? new Date(bill.dispense_date).toLocaleDateString("en-IN")
                   : "—"}
               </p>
             </div>
 
-            <div className="space-y-2">
-              <p>
-                <span className="font-semibold">Patient:</span>{" "}
+            <div className="min-w-0 space-y-2">
+              <p className="break-words">
+                <span className="font-semibold">
+                  Patient:
+                </span>{" "}
                 {bill.patient_details?.full_name || "—"}
               </p>
-              <p>
-                <span className="font-semibold">Doctor:</span>{" "}
+
+              <p className="break-words">
+                <span className="font-semibold">
+                  Doctor:
+                </span>{" "}
                 {bill.doctor_name || "—"}
               </p>
-              <p>
-                <span className="font-semibold">Payment Status:</span>{" "}
+
+              <p className="break-words">
+                <span className="font-semibold">
+                  Payment Status:
+                </span>{" "}
                 <span
                   className={
                     bill.payment_status === "Paid"
-                      ? "text-green-700 font-semibold"
-                      : "text-amber-700 font-semibold"
+                      ? "font-semibold text-green-700"
+                      : "font-semibold text-amber-700"
                   }
                 >
                   {bill.payment_status}
@@ -347,64 +296,116 @@ const PrintBillPage = () => {
             </div>
           </div>
 
+          {/* ===================================== */}
+          {/* OPTIONAL BILL NOTE */}
+          {/* ===================================== */}
+
           {bill.bill_note ? (
-            <div className="mb-5 border border-amber-200 bg-amber-50 text-amber-800 rounded-xl px-4 py-3 text-base">
+            <div className="mb-5 break-words rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-800 sm:px-4 sm:text-base">
               {bill.bill_note}
             </div>
           ) : null}
 
-          <div className="overflow-x-auto mb-6">
-            <table className="w-full border border-[#a7d8bb] text-base">
+          {/* ===================================== */}
+          {/* MEDICINES TABLE */}
+          {/* ===================================== */}
+
+          <div className="bill-scroll mb-6 w-full max-w-full overflow-x-auto">
+            <table className="bill-table w-full min-w-[900px] border-collapse border border-gray-300 text-xs sm:text-sm lg:text-base">
               <thead>
-                <tr className="bg-[#f7fbf8]">
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-left">Medicine</th>
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-left">Dosage</th>
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-left">Instructions</th>
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-center">Prescribed</th>
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-center">Given</th>
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-center">Remaining</th>
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-right">Unit Price</th>
-                  <th className="border border-[#a7d8bb] px-3 py-3 text-right">Line Total</th>
+                <tr className="bg-gray-50">
+                  <th className="border border-gray-300 px-3 py-3 text-left">
+                    Medicine
+                  </th>
+
+                  <th className="border border-gray-300 px-3 py-3 text-left">
+                    Dosage
+                  </th>
+
+                  <th className="border border-gray-300 px-3 py-3 text-left">
+                    Instructions
+                  </th>
+
+                  <th className="border border-gray-300 px-3 py-3 text-center">
+                    Prescribed
+                  </th>
+
+                  <th className="border border-gray-300 px-3 py-3 text-center">
+                    Given
+                  </th>
+
+                  <th className="border border-gray-300 px-3 py-3 text-center">
+                    Remaining
+                  </th>
+
+                  <th className="border border-gray-300 px-3 py-3 text-right">
+                    Unit Price
+                  </th>
+
+                  <th className="border border-gray-300 px-3 py-3 text-right">
+                    Line Total
+                  </th>
                 </tr>
               </thead>
+
               <tbody>
                 {bill.items?.length ? (
                   bill.items.map((item, index) => (
-                    <tr key={index} className="align-top">
-                      <td className="border border-[#d7eee0] px-3 py-3">
-                        <p className="font-medium text-gray-900">{item.medicine_name}</p>
+                    <tr
+                      key={index}
+                      className="align-top"
+                    >
+                      <td className="border border-gray-200 px-3 py-3">
+                        <p className="break-words font-medium text-gray-900">
+                          {item.medicine_name}
+                        </p>
+
                         {item.batch_numbers?.length ? (
-                          <p className="text-sm text-gray-500 mt-1">
-                            Batch: {item.batch_numbers.join(", ")}
+                          <p className="mt-1 break-words text-xs text-gray-500 sm:text-sm">
+                            Batch:{" "}
+                            {item.batch_numbers.join(", ")}
                           </p>
                         ) : null}
+
                         {item.is_partial ? (
-                          <p className="text-sm text-red-600 mt-1 font-medium">
+                          <p className="mt-1 text-xs font-medium text-red-600 sm:text-sm">
                             Partial Dispense
                           </p>
                         ) : null}
                       </td>
 
-                      <td className="border border-[#d7eee0] px-3 py-3">
+                      <td className="border border-gray-200 px-3 py-3">
                         {item.dosage || "—"}
                       </td>
-                      <td className="border border-[#d7eee0] px-3 py-3">
+
+                      <td className="border border-gray-200 px-3 py-3 break-words">
                         {item.instructions || "—"}
                       </td>
-                      <td className="border border-[#d7eee0] px-3 py-3 text-center">
+
+                      <td className="border border-gray-200 px-3 py-3 text-center">
                         {item.prescribed_quantity}
                       </td>
-                      <td className="border border-[#d7eee0] px-3 py-3 text-center">
+
+                      <td className="border border-gray-200 px-3 py-3 text-center">
                         {item.dispensed_quantity}
                       </td>
-                      <td className="border border-[#d7eee0] px-3 py-3 text-center">
+
+                      <td className="border border-gray-200 px-3 py-3 text-center">
                         {item.remaining_quantity}
                       </td>
-                      <td className="border border-[#d7eee0] px-3 py-3 text-right">
-                        ₹{parseFloat(item.unit_price || 0).toFixed(2)}
+
+                      <td className="border border-gray-200 px-3 py-3 text-right">
+                        ₹
+                        {parseFloat(
+                          item.unit_price || 0
+                        ).toFixed(2)}
                       </td>
-                      <td className="border border-[#d7eee0] px-3 py-3 text-right font-medium">
-                        ₹{parseFloat(item.line_total || 0).toFixed(2)}
+
+                      <td className="border border-gray-200 px-3 py-3 text-right font-medium">
+                        ₹
+                        {parseFloat(
+                          item.line_total || 0
+                        ).toFixed(2)}
                       </td>
                     </tr>
                   ))
@@ -412,7 +413,7 @@ const PrintBillPage = () => {
                   <tr>
                     <td
                       colSpan={8}
-                      className="border border-[#d7eee0] px-3 py-8 text-center text-gray-500 text-base"
+                      className="border border-gray-200 px-3 py-8 text-center text-sm text-gray-500"
                     >
                       No items found.
                     </td>
@@ -422,14 +423,26 @@ const PrintBillPage = () => {
             </table>
           </div>
 
-          {bill.items?.some((item) => item.is_partial) ? (
+          {/* ===================================== */}
+          {/* PARTIAL DISPENSE NOTES */}
+          {/* ===================================== */}
+
+          {bill.items?.some(
+            (item) => item.is_partial
+          ) ? (
             <div className="mb-6">
-              <h3 className="font-semibold text-red-700 text-lg mb-2">Important Note</h3>
+              <h3 className="mb-2 text-base font-semibold text-red-700 sm:text-lg">
+                Important Note
+              </h3>
+
               <div className="space-y-2">
                 {bill.items
                   .filter((item) => item.is_partial)
                   .map((item, index) => (
-                    <p key={index} className="text-base text-red-700">
+                    <p
+                      key={index}
+                      className="break-words text-sm text-red-700 sm:text-base"
+                    >
                       • {item.note}
                     </p>
                   ))}
@@ -437,29 +450,55 @@ const PrintBillPage = () => {
             </div>
           ) : null}
 
-          <div className="ml-auto w-full max-w-sm border-t border-[#a7d8bb] pt-4 space-y-3 text-base">
-            <div className="flex justify-between">
+          {/* ===================================== */}
+          {/* BILL SUMMARY */}
+          {/* ===================================== */}
+
+          <div className="bill-summary ml-auto w-full max-w-sm space-y-3 border-t border-gray-300 pt-4 text-sm sm:text-base">
+            <div className="flex items-center justify-between gap-3">
               <span>Subtotal</span>
-              <span>₹{parseFloat(bill.total_amount || 0).toFixed(2)}</span>
+
+              <span className="shrink-0">
+                ₹
+                {parseFloat(
+                  bill.total_amount || 0
+                ).toFixed(2)}
+              </span>
             </div>
-            <div className="flex justify-between">
+
+            <div className="flex items-center justify-between gap-3">
               <span>Discount</span>
-              <span>₹{parseFloat(bill.discount || 0).toFixed(2)}</span>
+
+              <span className="shrink-0">
+                ₹
+                {parseFloat(
+                  bill.discount || 0
+                ).toFixed(2)}
+              </span>
             </div>
-            <div className="flex justify-between font-bold text-xl border-t border-[#a7d8bb] pt-3">
+
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-gray-300 pt-3 text-lg font-bold sm:text-xl">
               <span>Final Amount</span>
-              <span className="text-[#15803d]">
-                ₹{parseFloat(bill.final_amount || 0).toFixed(2)}
+
+              <span className="break-all text-green-700">
+                ₹
+                {parseFloat(
+                  bill.final_amount || 0
+                ).toFixed(2)}
               </span>
             </div>
           </div>
 
-          <div className="mt-10 text-center text-sm text-gray-500">
+          {/* ===================================== */}
+          {/* FOOTER */}
+          {/* ===================================== */}
+
+          <div className="bill-footer mt-10 text-center text-xs text-gray-500 sm:text-sm">
             Thank you. Please keep this bill for your records.
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

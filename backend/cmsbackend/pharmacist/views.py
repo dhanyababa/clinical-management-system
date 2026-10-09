@@ -1,5 +1,5 @@
 
-#         )
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -9,6 +9,7 @@ from rest_framework.filters import SearchFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db import transaction
 
+from django.db.models.deletion import ProtectedError
 from .models import (
     Medicine, MedicineBatch, Dispense, DispenseItem, MedicineBill, MedicineStockLog
 )
@@ -80,7 +81,21 @@ class MedicineViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.delete()
+
+        try:
+            instance.delete()
+
+        except ProtectedError:
+            return Response(
+                {
+                    "message": (
+                        "Cannot delete this medicine because it "
+                        "is used in existing prescriptions."
+                    )
+                },
+                status=status.HTTP_409_CONFLICT,
+            )
+
         return Response(
             {"message": "Medicine deleted successfully"},
             status=status.HTTP_204_NO_CONTENT,

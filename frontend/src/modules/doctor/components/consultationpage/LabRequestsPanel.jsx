@@ -12,11 +12,9 @@ const LabRequestsPanel = ({ labRequests = [] }) => {
   const isEmpty = !hasPending && hasRequests && allResults.length === 0;
 
   return (
-    <div className="h-full flex flex-col bg-[#1e293b] border border-white/10 rounded-xl p-4 md:p-5 text-white">
-
+    <div className="w-full min-w-0 h-full flex flex-col bg-[#1e293b] border border-white/10 rounded-xl p-3 sm:p-4 lg:p-5 text-white">
       {/* Title + Status */}
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">
+    <div className="flex flex-wrap justify-between items-center gap-2 mb-4">        <h2 className="text-lg font-semibold">
           Lab Results
         </h2>
 
@@ -57,13 +55,13 @@ const LabRequestsPanel = ({ labRequests = [] }) => {
                 className="flex flex-col bg-white/10 p-3 rounded-lg hover:bg-white/15 transition"
               >
 
-                <div className="flex justify-between items-center w-full">
-                  <span className="text-gray-300">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 w-full min-w-0">
+                  <span className="text-gray-300 break-words">
                     {item.test_name || "Test"}
                   </span>
 
                   <span
-                    className={`font-semibold ${
+                    className={`font-semibold break-words ${
                       item.is_critical
                         ? "text-red-400"
                         : "text-green-300"

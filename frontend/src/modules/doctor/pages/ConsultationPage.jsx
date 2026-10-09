@@ -99,11 +99,9 @@ const ConsultationPage = () => {
 
   // ─── Render ──────────────────────────────────────────────────────
   return (
-    <div className="p-4 md:p-5 flex flex-col gap-4 md:gap-5 text-white min-h-screen bg-gradient-to-br from-[#020617] via-[#020617] to-[#0f172a]">
-
+      <div className="min-h-screen min-w-0 w-full overflow-x-hidden bg-gradient-to-br from-[#020617] via-[#020617] to-[#0f172a] p-3 sm:p-4 lg:p-5 flex flex-col gap-4 lg:gap-5 text-white">
       {/* TOP ROW */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1.1fr_1.4fr_1.2fr] gap-4 md:gap-5 h-auto lg:h-[520px]">
-
+      <div className="grid min-w-0 grid-cols-1 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1.4fr)_minmax(0,1.2fr)] gap-4 lg:gap-5">
         <RainbowCard className="h-full">
           <PatientInfoCard
             patient={data.patient}
@@ -151,8 +149,7 @@ const ConsultationPage = () => {
       </div>
 
       {/* BOTTOM ROW */}
-      <div className="grid grid-cols-1 lg:grid-cols-[0.8fr_2.2fr] gap-4 md:gap-5 h-auto lg:h-[350px]">
-
+      <div className="grid min-w-0 grid-cols-1 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,2.2fr)] gap-4 lg:gap-5">
         <RainbowCard className="h-full">
           <HistoryNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
         </RainbowCard>

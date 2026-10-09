@@ -1,200 +1,3 @@
-// import React, { useEffect, useState } from "react";
-// import PharmacistLayout from "../components/PharmacistLayout";
-// import {
-//   getMedicines,
-//   createMedicine,
-//   updateMedicine,
-//   deleteMedicine,
-// } from "../api/pharmacistApi";
-
-// const MedicinesPage = () => {
-//   const [medicines, setMedicines] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-//   const [success, setSuccess] = useState("");
-//   const [search, setSearch] = useState("");
-//   const [showModal, setShowModal] = useState(false);
-//   const [editingMed, setEditingMed] = useState(null);
-//   const [form, setForm] = useState({ name: "", description: "", unit: "", price: "" });
-//   const [formError, setFormError] = useState("");
-//   const [submitting, setSubmitting] = useState(false);
-
-//   const fetchMedicines = (q = "") => {
-//     setLoading(true);
-//     getMedicines(q)
-//       .then((res) => setMedicines(res.results || res.data || []))
-//       .catch(() => setError("Failed to load medicines."))
-//       .finally(() => setLoading(false));
-//   };
-
-//   useEffect(() => {
-//     fetchMedicines();
-//   }, []);
-
-//   const handleSearch = (e) => {
-//     setSearch(e.target.value);
-//     fetchMedicines(e.target.value);
-//   };
-
-//   const openAdd = () => {
-//     setEditingMed(null);
-//     setForm({ name: "", description: "", unit: "", price: "" });
-//     setFormError("");
-//     setShowModal(true);
-//   };
-
-//   const openEdit = (med) => {
-//     setEditingMed(med);
-//     setForm({
-//       name: med.name,
-//       description: med.description || "",
-//       unit: med.unit || "",
-//       price: med.price,
-//     });
-//     setFormError("");
-//     setShowModal(true);
-//   };
-
-//   const handleSubmit = async () => {
-//     if (!form.name.trim() || !form.price) {
-//       setFormError("Name and price are required.");
-//       return;
-//     }
-//     setSubmitting(true);
-//     setFormError("");
-//     try {
-//       if (editingMed) {
-//         await updateMedicine(editingMed.medicine_id, form);
-//         setSuccess("Medicine updated.");
-//       } else {
-//         await createMedicine(form);
-//         setSuccess("Medicine added.");
-//       }
-//       setShowModal(false);
-//       fetchMedicines(search);
-//     } catch (err) {
-//       const msg = err?.response?.data ? JSON.stringify(err.response.data) : "Failed to save.";
-//       setFormError(msg);
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   };
-
-//   const handleDelete = async (id) => {
-//     if (!window.confirm("Delete this medicine?")) return;
-//     try {
-//       await deleteMedicine(id);
-//       setSuccess("Medicine deleted.");
-//       fetchMedicines(search);
-//     } catch {
-//       setError("Failed to delete.");
-//     }
-//   };
-
-//   return (
-//     <PharmacistLayout title="Medicines">
-//       <div className="flex items-center justify-between mb-4 gap-4">
-//         <input
-//           type="text"
-//           placeholder="Search medicines..."
-//           value={search}
-//           onChange={handleSearch}
-//           className="bg-[#0d1629] border border-[#1e2d4a] text-white text-sm rounded-xl px-4 py-2.5 focus:border-red-400/50 outline-none w-72"
-//         />
-//         <button
-//           onClick={openAdd}
-//           className="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2.5 rounded-xl transition"
-//         >
-//           + Add Medicine
-//         </button>
-//       </div>
-
-//       {error && <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">{error}</div>}
-//       {success && <div className="mb-4 bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-lg">{success}</div>}
-
-//       <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl overflow-hidden">
-//         <div className="overflow-x-auto">
-//           <table className="min-w-full text-sm">
-//             <thead>
-//               <tr className="border-b border-[#1e2d4a] text-gray-500 text-xs uppercase tracking-wider">
-//                 <th className="px-4 py-3 text-left">Name</th>
-//                 <th className="px-4 py-3 text-left">Unit</th>
-//                 <th className="px-4 py-3 text-left">Price (₹)</th>
-//                 <th className="px-4 py-3 text-left">Description</th>
-//                 <th className="px-4 py-3 text-left">Actions</th>
-//               </tr>
-//             </thead>
-//             <tbody>
-//               {loading ? (
-//                 [...Array(5)].map((_, i) => (
-//                   <tr key={i} className="border-b border-[#1e2d4a]">
-//                     {[...Array(5)].map((_, j) => (
-//                       <td key={j} className="px-4 py-3"><div className="h-3 bg-[#1e2d4a] rounded animate-pulse w-20" /></td>
-//                     ))}
-//                   </tr>
-//                 ))
-//               ) : medicines.length === 0 ? (
-//                 <tr><td colSpan={5} className="text-center text-gray-500 py-12 text-sm">No medicines found.</td></tr>
-//               ) : (
-//                 medicines.map((med) => (
-//                   <tr key={med.medicine_id} className="border-b border-[#1e2d4a] hover:bg-[#111d35] transition-colors">
-//                     <td className="px-4 py-3 text-white font-medium">{med.name}</td>
-//                     <td className="px-4 py-3 text-gray-400">{med.unit || "—"}</td>
-//                     <td className="px-4 py-3 text-red-400 font-semibold">₹{med.price}</td>
-//                     <td className="px-4 py-3 text-gray-400 max-w-xs truncate">{med.description || "—"}</td>
-//                     <td className="px-4 py-3 flex gap-2">
-//                       <button onClick={() => openEdit(med)} className="text-xs text-blue-400 hover:text-blue-300 border border-blue-400/30 px-3 py-1 rounded-lg transition">Edit</button>
-//                       <button onClick={() => handleDelete(med.medicine_id)} className="text-xs text-red-400 hover:text-red-300 border border-red-400/30 px-3 py-1 rounded-lg transition">Delete</button>
-//                     </td>
-//                   </tr>
-//                 ))
-//               )}
-//             </tbody>
-//           </table>
-//         </div>
-//       </div>
-
-//       {/* Modal */}
-//       {showModal && (
-//         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50">
-//           <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-2xl p-6 w-full max-w-md">
-//             <h3 className="text-white font-semibold text-lg mb-4">
-//               {editingMed ? "Edit Medicine" : "Add Medicine"}
-//             </h3>
-//             {formError && <div className="mb-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs px-3 py-2 rounded-lg">{formError}</div>}
-//             <div className="space-y-3">
-//               {[
-//                 { key: "name", label: "Medicine Name", type: "text" },
-//                 { key: "unit", label: "Unit (e.g. tablet, ml)", type: "text" },
-//                 { key: "price", label: "Price (₹)", type: "number" },
-//                 { key: "description", label: "Description", type: "text" },
-//               ].map(({ key, label, type }) => (
-//                 <div key={key}>
-//                   <label className="text-xs text-gray-400 block mb-1">{label}</label>
-//                   <input
-//                     type={type}
-//                     value={form[key]}
-//                     onChange={(e) => setForm((p) => ({ ...p, [key]: e.target.value }))}
-//                     className="w-full bg-[#060d1a] border border-[#1e2d4a] text-white text-sm rounded-lg px-3 py-2 focus:border-red-400/50 outline-none"
-//                   />
-//                 </div>
-//               ))}
-//             </div>
-//             <div className="flex gap-3 mt-5">
-//               <button onClick={() => setShowModal(false)} className="flex-1 border border-[#1e2d4a] text-gray-400 hover:text-white py-2.5 rounded-xl text-sm transition">Cancel</button>
-//               <button onClick={handleSubmit} disabled={submitting} className="flex-1 bg-red-500 hover:bg-red-600 disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-semibold transition">
-//                 {submitting ? "Saving..." : "Save"}
-//               </button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </PharmacistLayout>
-//   );
-// };
-
-// export default MedicinesPage;
-
 import React, { useEffect, useState } from "react";
 import PharmacistLayout from "../components/PharmacistLayout";
 import {
@@ -212,7 +15,12 @@ const MedicinesPage = () => {
   const [search, setSearch] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingMed, setEditingMed] = useState(null);
-  const [form, setForm] = useState({ name: "", description: "", unit: "", price: "" });
+  const [form, setForm] = useState({
+    name: "",
+    description: "",
+    unit: "",
+    price: "",
+  });
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -235,7 +43,12 @@ const MedicinesPage = () => {
 
   const openAdd = () => {
     setEditingMed(null);
-    setForm({ name: "", description: "", unit: "", price: "" });
+    setForm({
+      name: "",
+      description: "",
+      unit: "",
+      price: "",
+    });
     setFormError("");
     setShowModal(true);
   };
@@ -257,8 +70,10 @@ const MedicinesPage = () => {
       setFormError("Name and price are required.");
       return;
     }
+
     setSubmitting(true);
     setFormError("");
+
     try {
       if (editingMed) {
         await updateMedicine(editingMed.medicine_id, form);
@@ -267,10 +82,14 @@ const MedicinesPage = () => {
         await createMedicine(form);
         setSuccess("Medicine added.");
       }
+
       setShowModal(false);
       fetchMedicines(search);
     } catch (err) {
-      const msg = err?.response?.data ? JSON.stringify(err.response.data) : "Failed to save.";
+      const msg = err?.response?.data
+        ? JSON.stringify(err.response.data)
+        : "Failed to save.";
+
       setFormError(msg);
     } finally {
       setSubmitting(false);
@@ -279,179 +98,340 @@ const MedicinesPage = () => {
 
   const handleDelete = async (id) => {
     if (!window.confirm("Delete this medicine?")) return;
+
     try {
       await deleteMedicine(id);
       setSuccess("Medicine deleted.");
       fetchMedicines(search);
-    } catch {
-      setError("Failed to delete.");
-    }
+    } catch (error) {
+        setError(
+          error?.response?.data?.message ||
+          error?.response?.data?.detail ||
+          "Failed to delete."
+        );
+      }
   };
 
   return (
     <PharmacistLayout title="Medicines">
-      {/* Top Bar */}
-      <div className="flex items-center justify-between mb-6 gap-4">
-        <input
-          type="text"
-          placeholder="Search medicines..."
-          value={search}
-          onChange={handleSearch}
-          className="bg-white border border-[#dbe7e2] text-gray-800 text-base rounded-xl px-4 py-3 focus:border-[#86c8a3] outline-none w-80"
-        />
+      <div className="w-full min-w-0">
 
-        <button
-          onClick={openAdd}
-          className="bg-[#16a34a] hover:bg-[#15803d] text-white text-base font-medium px-5 py-3 rounded-xl transition"
-        >
-          + Add Medicine
-        </button>
-      </div>
+        {/* ============================= */}
+        {/* TOP BAR */}
+        {/* ============================= */}
 
-      {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-base px-4 py-3 rounded-xl">
-          {error}
+        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+          <input
+            type="text"
+            placeholder="Search medicines..."
+            value={search}
+            onChange={handleSearch}
+            className="
+              w-full min-w-0
+              rounded-xl
+              border border-[#26344c]
+              bg-[#0d1629]
+              px-4 py-3
+              text-sm sm:text-base text-white
+              placeholder:text-gray-500
+              outline-none
+              transition
+              focus:border-red-400
+              sm:max-w-sm
+            "
+          />
+
+          <button
+            type="button"
+            onClick={openAdd}
+            className="
+              w-full shrink-0 sm:w-auto
+              rounded-xl
+              bg-red-500
+              px-5 py-3
+              text-sm sm:text-base
+              font-medium text-white
+              transition
+              hover:bg-red-400
+            "
+          >
+            + Add Medicine
+          </button>
         </div>
-      )}
 
-      {success && (
-        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 text-base px-4 py-3 rounded-xl">
-          {success}
-        </div>
-      )}
+        {/* ============================= */}
+        {/* ERROR / SUCCESS MESSAGES */}
+        {/* ============================= */}
 
-      {/* Table */}
-      <div className="bg-white border border-[#e3ece8] rounded-2xl overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-base">
-            <thead>
-              <tr className="bg-[#f7faf8] border-b border-[#e3ece8] text-gray-500 text-sm uppercase tracking-wider">
-                <th className="px-5 py-4 text-left">Name</th>
-                <th className="px-5 py-4 text-left">Unit</th>
-                <th className="px-5 py-4 text-left">Price (₹)</th>
-                <th className="px-5 py-4 text-left">Description</th>
-                <th className="px-5 py-4 text-left">Actions</th>
-              </tr>
-            </thead>
+        {error && (
+          <div className="mb-4 break-words rounded-xl border border-red-400/30 bg-red-500/10 px-3 py-3 text-sm text-red-300 sm:px-4">
+            {error}
+          </div>
+        )}
 
-            <tbody>
-              {loading ? (
-                [...Array(5)].map((_, i) => (
-                  <tr key={i} className="border-b border-[#edf3f0]">
-                    {[...Array(5)].map((_, j) => (
-                      <td key={j} className="px-5 py-4">
-                        <div className="h-4 bg-[#edf3f0] rounded animate-pulse w-24" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : medicines.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="text-center text-gray-500 py-14 text-lg">
-                    No medicines found.
-                  </td>
+        {success && (
+          <div className="mb-4 break-words rounded-xl border border-green-400/30 bg-green-400/10 px-3 py-3 text-sm text-green-300 sm:px-4">
+            {success}
+          </div>
+        )}
+
+        {/* ============================= */}
+        {/* MEDICINES TABLE */}
+        {/* ============================= */}
+
+        <div className="w-full min-w-0 overflow-hidden rounded-xl border border-[#1e2d4a] bg-[#0d1629]">
+          <div className="w-full max-w-full overflow-x-auto">
+            <table className="w-full min-w-[800px] text-sm sm:text-base">
+              <thead>
+                <tr className="border-b border-[#1e2d4a] bg-[#101c30] text-xs uppercase tracking-wider text-gray-400 sm:text-sm">
+                  <th className="px-4 py-4 text-left sm:px-5">
+                    Name
+                  </th>
+
+                  <th className="px-4 py-4 text-left sm:px-5">
+                    Unit
+                  </th>
+
+                  <th className="px-4 py-4 text-left sm:px-5">
+                    Price (₹)
+                  </th>
+
+                  <th className="px-4 py-4 text-left sm:px-5">
+                    Description
+                  </th>
+
+                  <th className="px-4 py-4 text-left sm:px-5">
+                    Actions
+                  </th>
                 </tr>
-              ) : (
-                medicines.map((med) => (
-                  <tr
-                    key={med.medicine_id}
-                    className="border-b border-[#edf3f0] hover:bg-[#f8fcf9] transition"
-                  >
-                    <td className="px-5 py-4 text-gray-900 font-semibold">
-                      {med.name}
-                    </td>
+              </thead>
 
-                    <td className="px-5 py-4 text-gray-600">
-                      {med.unit || "—"}
-                    </td>
-
-                    <td className="px-5 py-4 text-[#15803d] font-semibold">
-                      ₹{med.price}
-                    </td>
-
-                    <td className="px-5 py-4 text-gray-500 max-w-xs truncate">
-                      {med.description || "—"}
-                    </td>
-
-                    <td className="px-5 py-4 flex gap-2">
-                      <button
-                        onClick={() => openEdit(med)}
-                        className="text-sm text-[#166534] hover:text-[#14532d] border border-[#cfe8d9] bg-[#f7fcf9] px-3 py-1.5 rounded-lg transition"
-                      >
-                        Edit
-                      </button>
-
-                      <button
-                        onClick={() => handleDelete(med.medicine_id)}
-                        className="text-sm text-red-600 hover:text-red-700 border border-red-200 bg-red-50 px-3 py-1.5 rounded-lg transition"
-                      >
-                        Delete
-                      </button>
+              <tbody>
+                {loading ? (
+                  [...Array(5)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-[#1e2d4a]"
+                    >
+                      {[...Array(5)].map((_, j) => (
+                        <td
+                          key={j}
+                          className="px-4 py-4 sm:px-5"
+                        >
+                          <div className="h-4 w-24 animate-pulse rounded bg-[#1e2d4a]" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : medicines.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="px-4 py-14 text-center text-sm text-gray-400 sm:text-base"
+                    >
+                      No medicines found.
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                ) : (
+                  medicines.map((med) => (
+                    <tr
+                      key={med.medicine_id}
+                      className="border-b border-[#1e2d4a] transition-colors hover:bg-[#111d35]"
+                    >
+                      <td className="px-4 py-4 font-semibold text-white sm:px-5">
+                        {med.name}
+                      </td>
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white border border-[#e3ece8] rounded-2xl p-6 w-full max-w-md shadow-lg">
-            <h3 className="text-gray-900 font-semibold text-xl mb-5">
-              {editingMed ? "Edit Medicine" : "Add Medicine"}
-            </h3>
+                      <td className="px-4 py-4 text-gray-300 sm:px-5">
+                        {med.unit || "—"}
+                      </td>
 
-            {formError && (
-              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-3 py-2 rounded-lg">
-                {formError}
-              </div>
-            )}
+                      <td className="whitespace-nowrap px-4 py-4 font-semibold text-red-300 sm:px-5">
+                        ₹{med.price}
+                      </td>
 
-            <div className="space-y-4">
-              {[
-                { key: "name", label: "Medicine Name", type: "text" },
-                { key: "unit", label: "Unit", type: "text" },
-                { key: "price", label: "Price (₹)", type: "number" },
-                { key: "description", label: "Description", type: "text" },
-              ].map(({ key, label, type }) => (
-                <div key={key}>
-                  <label className="text-sm text-gray-600 block mb-1">
-                    {label}
-                  </label>
-                  <input
-                    type={type}
-                    value={form[key]}
-                    onChange={(e) =>
-                      setForm((p) => ({ ...p, [key]: e.target.value }))
-                    }
-                    className="w-full bg-white border border-[#dbe7e2] text-gray-800 text-base rounded-lg px-3 py-2.5 focus:border-[#86c8a3] outline-none"
-                  />
-                </div>
-              ))}
-            </div>
+                      <td className="max-w-xs truncate px-4 py-4 text-gray-400 sm:px-5">
+                        {med.description || "—"}
+                      </td>
 
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={() => setShowModal(false)}
-                className="flex-1 border border-[#dbe7e2] text-gray-600 py-3 rounded-xl text-base transition"
-              >
-                Cancel
-              </button>
+                      <td className="px-4 py-4 sm:px-5">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openEdit(med)}
+                            className="
+                              rounded-lg
+                              border border-red-400/30
+                              bg-red-400/10
+                              px-3 py-2
+                              text-xs sm:text-sm
+                              text-red-300
+                              transition
+                              hover:bg-red-400/20
+                            "
+                          >
+                            Edit
+                          </button>
 
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="flex-1 bg-[#16a34a] hover:bg-[#15803d] text-white py-3 rounded-xl text-base font-medium transition disabled:opacity-50"
-              >
-                {submitting ? "Saving..." : "Save"}
-              </button>
-            </div>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleDelete(med.medicine_id)
+                            }
+                            className="
+                              rounded-lg
+                              border border-red-500/30
+                              bg-red-500/10
+                              px-3 py-2
+                              text-xs sm:text-sm
+                              text-red-400
+                              transition
+                              hover:bg-red-500/20
+                            "
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
+
+        {/* ============================= */}
+        {/* ADD / EDIT MEDICINE MODAL */}
+        {/* ============================= */}
+
+        {showModal && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 px-3 py-4 backdrop-blur-sm sm:px-5">
+            <div
+              className="
+                w-full max-w-md
+                max-h-[90dvh] overflow-y-auto
+                rounded-2xl
+                border border-[#26344c]
+                bg-[#101b2e]
+                p-4 sm:p-6
+                shadow-2xl
+              "
+              role="dialog"
+              aria-modal="true"
+              aria-label={
+                editingMed ? "Edit Medicine" : "Add Medicine"
+              }
+            >
+              <h3 className="mb-5 text-lg font-semibold text-white sm:text-xl">
+                {editingMed ? "Edit Medicine" : "Add Medicine"}
+              </h3>
+
+              {formError && (
+                <div className="mb-4 break-words rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+                  {formError}
+                </div>
+              )}
+
+              <div className="space-y-4">
+                {[
+                  {
+                    key: "name",
+                    label: "Medicine Name",
+                    type: "text",
+                  },
+                  {
+                    key: "unit",
+                    label: "Unit",
+                    type: "text",
+                  },
+                  {
+                    key: "price",
+                    label: "Price (₹)",
+                    type: "number",
+                  },
+                  {
+                    key: "description",
+                    label: "Description",
+                    type: "text",
+                  },
+                ].map(({ key, label, type }) => (
+                  <div key={key} className="min-w-0">
+                    <label className="mb-1 block text-sm text-gray-300">
+                      {label}
+                    </label>
+
+                    <input
+                      type={type}
+                      value={form[key]}
+                      onChange={(e) =>
+                        setForm((p) => ({
+                          ...p,
+                          [key]: e.target.value,
+                        }))
+                      }
+                      className="
+                        w-full min-w-0
+                        rounded-lg
+                        border border-[#26344c]
+                        bg-[#060d1a]
+                        px-3 py-2.5
+                        text-sm sm:text-base
+                        text-white
+                        outline-none
+                        transition
+                        focus:border-red-400
+                      "
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* Modal actions */}
+              <div className="mt-6 flex flex-col gap-3 min-[400px]:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="
+                    w-full min-[400px]:flex-1
+                    rounded-xl
+                    border border-[#26344c]
+                    px-4 py-3
+                    text-sm sm:text-base
+                    text-gray-300
+                    transition
+                    hover:bg-white/5
+                    hover:text-white
+                  "
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className="
+                    w-full min-[400px]:flex-1
+                    rounded-xl
+                    bg-red-500
+                    px-4 py-3
+                    text-sm sm:text-base
+                    font-medium text-white
+                    transition
+                    hover:bg-red-400
+                    disabled:cursor-not-allowed
+                    disabled:opacity-50
+                  "
+                >
+                  {submitting ? "Saving..." : "Save"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+      </div>
     </PharmacistLayout>
   );
 };

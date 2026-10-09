@@ -9,8 +9,7 @@ const HistoryNavigation = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="bg-[#1e293b] border border-white/10 rounded-xl p-4 text-white h-full">
-
+<div className="w-full min-w-0 bg-[#1e293b] border border-white/10 rounded-xl p-3 sm:p-4 text-white h-full">
       <div className="flex flex-col gap-3">
 
         {tabs.map((tab) => {
@@ -21,8 +20,7 @@ const HistoryNavigation = ({ activeTab, setActiveTab }) => {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`
-                flex items-center gap-3 w-full text-left px-4 py-4 rounded-lg text-base font-semibold
-
+                  flex items-center gap-2 sm:gap-3 w-full min-w-0 text-left px-3 sm:px-4 py-3 sm:py-4 rounded-lg text-sm sm:text-base font-semibold
                 ${
                   isActive
                     ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
@@ -39,7 +37,7 @@ const HistoryNavigation = ({ activeTab, setActiveTab }) => {
               )}
 
               {/* Label */}
-              <span>{tab.label}</span>
+              <span className="min-w-0 break-words">{tab.label}</span>
 
             </button>
           );

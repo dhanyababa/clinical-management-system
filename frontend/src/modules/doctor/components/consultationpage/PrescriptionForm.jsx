@@ -3,6 +3,7 @@ import API from "../../../api";
 
 const PrescriptionForm = ({ onSubmit, onClose }) => {
   const [medicinesList, setMedicinesList] = useState([]);
+
   const [items, setItems] = useState([
     {
       medicine_name: "",
@@ -13,7 +14,7 @@ const PrescriptionForm = ({ onSubmit, onClose }) => {
     },
   ]);
 
-  // 🔥 Fetch medicines from backend
+  // Fetch medicines from backend
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
@@ -27,14 +28,14 @@ const PrescriptionForm = ({ onSubmit, onClose }) => {
     fetchMedicines();
   }, []);
 
-  // 🔥 Handle input change
+  // Handle input change
   const handleChange = (index, field, value) => {
     const updated = [...items];
     updated[index][field] = value;
     setItems(updated);
   };
 
-  // ➕ Add new row
+  // Add new medicine
   const addRow = () => {
     setItems([
       ...items,
@@ -48,13 +49,13 @@ const PrescriptionForm = ({ onSubmit, onClose }) => {
     ]);
   };
 
-  // ❌ Remove row
+  // Remove medicine
   const removeRow = (index) => {
     const updated = items.filter((_, i) => i !== index);
     setItems(updated);
   };
 
-  // 🚀 Submit
+  // Submit prescription
   const handleSubmit = () => {
     const valid = items.every(
       (item) =>
@@ -69,7 +70,6 @@ const PrescriptionForm = ({ onSubmit, onClose }) => {
       return;
     }
 
-    // ✅ Ensure medicine IDs are numbers
     const formattedItems = items.map((item) => ({
       ...item,
       medicine_name: Number(item.medicine_name),
@@ -79,108 +79,188 @@ const PrescriptionForm = ({ onSubmit, onClose }) => {
   };
 
   return (
-    <div className="bg-[#1e293b] border border-white/10 rounded-xl p-5 text-white mt-4">
+    <div className="w-full min-w-0 max-w-full bg-[#1e293b] border border-white/10 rounded-xl p-3 sm:p-4 lg:p-5 text-white mt-4">
 
-      <h2 className="text-lg font-semibold mb-4">💊 Create Prescription</h2>
+      {/* Title */}
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 break-words">
+        💊 Create Prescription
+      </h2>
 
-      <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2">
+      {/* Medicine List */}
+      <div className="space-y-4 max-h-[60vh] lg:max-h-[400px] overflow-y-auto overflow-x-hidden pr-1 sm:pr-2 min-w-0">
+
         {items.map((item, index) => (
           <div
             key={index}
-            className="grid grid-cols-1 md:grid-cols-5 gap-2 bg-[#334155] p-3 rounded-lg"
+            className="w-full min-w-0 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3 bg-[#334155] p-3 sm:p-4 rounded-lg"
           >
-            <select
-              className="bg-[#1e293b] p-2 rounded"
-              value={item.medicine_name}
-              onChange={(e) =>
-                handleChange(index, "medicine_name", e.target.value)
-              }
-            >
-              <option value="">Select Medicine</option>
-              {medicinesList.map((med, idx) => {
-                const medId = med.medicine_id || med.id;
-                return (
-                  <option key={medId || idx} value={medId}>
-                    {med.name}
-                  </option>
-                );
-              })}
-            </select>
 
-            <input
-              type="text"
-              placeholder="Dosage"
-              className="bg-[#1e293b] p-2 rounded"
-              value={item.dosage}
-              onChange={(e) =>
-                handleChange(index, "dosage", e.target.value)
-              }
-            />
+            {/* Medicine */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs text-gray-300">
+                Medicine
+              </label>
 
-            <input
-              type="text"
-              placeholder="Frequency"
-              className="bg-[#1e293b] p-2 rounded"
-              value={item.frequency}
-              onChange={(e) =>
-                handleChange(index, "frequency", e.target.value)
-              }
-            />
+              <select
+                className="w-full min-w-0 bg-[#1e293b] p-3 rounded-md text-base sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                value={item.medicine_name}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    "medicine_name",
+                    e.target.value
+                  )
+                }
+              >
+                <option value="">Select Medicine</option>
 
-            <input
-              type="number"
-              placeholder="Days"
-              className="bg-[#1e293b] p-2 rounded"
-              value={item.duration}
-              onChange={(e) =>
-                handleChange(index, "duration", e.target.value)
-              }
-            />
+                {medicinesList.map((med, idx) => {
+                  const medId = med.medicine_id || med.id;
 
-            <input
-              type="text"
-              placeholder="Instructions"
-              className="bg-[#1e293b] p-2 rounded"
-              value={item.instructions}
-              onChange={(e) =>
-                handleChange(index, "instructions", e.target.value)
-              }
-            />
+                  return (
+                    <option key={medId || idx} value={medId}>
+                      {med.name}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
 
-            <button
-              onClick={() => removeRow(index)}
-              className="text-red-400 text-sm col-span-full text-right"
-            >
-              Remove
-            </button>
+            {/* Dosage */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs text-gray-300">
+                Dosage
+              </label>
+
+              <input
+                type="text"
+                placeholder="Dosage"
+                className="w-full min-w-0 bg-[#1e293b] p-3 rounded-md text-base sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                value={item.dosage}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    "dosage",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* Frequency */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs text-gray-300">
+                Frequency
+              </label>
+
+              <input
+                type="text"
+                placeholder="Frequency"
+                className="w-full min-w-0 bg-[#1e293b] p-3 rounded-md text-base sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                value={item.frequency}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    "frequency",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* Duration */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs text-gray-300">
+                Duration (Days)
+              </label>
+
+              <input
+                type="number"
+                placeholder="Days"
+                className="w-full min-w-0 bg-[#1e293b] p-3 rounded-md text-base sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                value={item.duration}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    "duration",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* Instructions */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs text-gray-300">
+                Instructions
+              </label>
+
+              <input
+                type="text"
+                placeholder="Instructions"
+                className="w-full min-w-0 bg-[#1e293b] p-3 rounded-md text-base sm:text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                value={item.instructions}
+                onChange={(e) =>
+                  handleChange(
+                    index,
+                    "instructions",
+                    e.target.value
+                  )
+                }
+              />
+            </div>
+
+            {/* Remove Medicine */}
+            <div className="col-span-full flex justify-end">
+              <button
+                type="button"
+                onClick={() => removeRow(index)}
+                className="text-red-400 hover:text-red-300 text-sm font-medium px-2 py-2 transition"
+              >
+                Remove
+              </button>
+            </div>
+
           </div>
         ))}
+
       </div>
 
-      <div className="flex justify-between mt-4">
+      {/* Bottom Buttons */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mt-4">
+
+        {/* Add Medicine */}
         <button
+          type="button"
           onClick={addRow}
-          className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-700"
+          className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 px-4 py-3 rounded-md font-medium transition"
         >
           + Add Medicine
         </button>
 
-        <div className="flex gap-2">
+        {/* Cancel and Save */}
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+
           <button
+            type="button"
             onClick={onClose}
-            className="bg-gray-500 px-4 py-2 rounded"
+            className="w-full sm:w-auto bg-gray-500 hover:bg-gray-600 px-5 py-3 rounded-md font-medium transition"
           >
             Cancel
           </button>
 
           <button
+            type="button"
             onClick={handleSubmit}
-            className="bg-green-600 px-4 py-2 rounded hover:bg-green-700"
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 px-5 py-3 rounded-md font-medium transition"
           >
             Save
           </button>
+
         </div>
+
       </div>
+
     </div>
   );
 };

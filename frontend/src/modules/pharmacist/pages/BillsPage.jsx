@@ -1,639 +1,33 @@
-// import React, { useEffect, useState } from "react";
-// import { useNavigate } from "react-router-dom";
-// import PharmacistLayout from "../components/PharmacistLayout";
-// // import { getMedicineBills } from "../api/pharmacistApi";
-// // import API from "../../../api";
-// import {
-//   getMedicineBills,
-//   getMedicineBillDetail,
-//   updateMedicineBill,
-// } from "../api/pharmacistApi";
-// // ─── BILLS PAGE ───────────────────────────────────────────────────────────────
-// const BillsPage = () => {
-//   const [bills, setBills] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-//   const [success, setSuccess] = useState("");
-//   const [filter, setFilter] = useState("all"); // "all" | "Pending" | "Paid"
-//   const [markingPaid, setMarkingPaid] = useState(null);
-//   const [selectedBill, setSelectedBill] = useState(null);
-// const [dateFilter, setDateFilter] = useState("all"); // all | today | yesterday | week
-// const [search, setSearch] = useState("");
-  
-//   const navigate = useNavigate();
-//   const fetchBills = () => {
-//     setLoading(true);
-//     getMedicineBills()
-//       .then((res) => setBills(res.results || res.data || []))
-//       .catch(() => setError("Failed to load bills."))
-//       .finally(() => setLoading(false));
-//   };
-//   const handleViewBill = async (bill) => {
-//   setError("");
-//   try {
-//     const res = await getMedicineBillDetail(bill.bill_id);
-//     const fullBill = res.data || res;
-//     setSelectedBill(fullBill);
-//   } catch (err) {
-//     setError("Failed to load bill details.");
-//   }
-// };
-
-//   useEffect(() => {
-//     fetchBills();
-//   }, []);
-// const isToday = (dateString) => {
-//   if (!dateString) return false;
-//   const d = new Date(dateString);
-//   const today = new Date();
-//   return d.toDateString() === today.toDateString();
-// };
-
-// const isYesterday = (dateString) => {
-//   if (!dateString) return false;
-//   const d = new Date(dateString);
-//   const yesterday = new Date();
-//   yesterday.setDate(yesterday.getDate() - 1);
-//   return d.toDateString() === yesterday.toDateString();
-// };
-
-// const isThisWeek = (dateString) => {
-//   if (!dateString) return false;
-//   const d = new Date(dateString);
-//   const now = new Date();
-
-//   const startOfWeek = new Date(now);
-//   startOfWeek.setHours(0, 0, 0, 0);
-//   startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday start
-
-//   const endOfWeek = new Date(startOfWeek);
-//   endOfWeek.setDate(startOfWeek.getDate() + 7);
-
-//   return d >= startOfWeek && d < endOfWeek;
-// };
-//   // const filteredBills =
-//   //   filter === "all" ? bills : bills.filter((b) => b.payment_status === filter);
-// const filteredBills = bills.filter((bill) => {
-//   // payment filter
-//   const paymentMatch =
-//     filter === "all" ? true : bill.payment_status === filter;
-
-//   // date filter
-//   const dateMatch =
-//     dateFilter === "all"
-//       ? true
-//       : dateFilter === "today"
-//       ? isToday(bill.created_at)
-//       : dateFilter === "yesterday"
-//       ? isYesterday(bill.created_at)
-//       : dateFilter === "week"
-//       ? isThisWeek(bill.created_at)
-//       : true;
-
-//   // search filter
-//   const patientName =
-//     bill.patient_details?.full_name?.toLowerCase() || "";
-//   const dispenseId =
-//     String(bill.dispense || bill.dispense_id || "").toLowerCase();
-//   const billId = String(bill.bill_id || "").toLowerCase();
-//   const q = search.trim().toLowerCase();
-
-//   const searchMatch =
-//     !q ||
-//     patientName.includes(q) ||
-//     dispenseId.includes(q) ||
-//     billId.includes(q);
-
-//   return paymentMatch && dateMatch && searchMatch;
-// });
-//   const totalRevenue = bills
-//     .filter((b) => b.payment_status === "Paid")
-//     .reduce((sum, b) => sum + parseFloat(b.final_amount || 0), 0);
-
-//   const pendingRevenue = bills
-//     .filter((b) => b.payment_status === "Pending")
-//     .reduce((sum, b) => sum + parseFloat(b.final_amount || 0), 0);
-
-//   // const handleMarkPaid = async (bill) => {
-//   //   setMarkingPaid(bill.bill_id);
-//   //   setError("");
-//   //   try {
-//   //     await API.patch(`/api/pharmacist/bills/${bill.bill_id}/`, {
-//   //       payment_status: "Paid",
-//   //     });
-//   //     setSuccess(`Bill #${bill.bill_id} marked as paid.`);
-//   //     fetchBills();
-//   //     if (selectedBill?.bill_id === bill.bill_id) {
-//   //       setSelectedBill({ ...selectedBill, payment_status: "Paid" });
-//   //     }
-//   //   } catch (err) {
-//   //     const msg = err?.response?.data
-//   //       ? JSON.stringify(err.response.data)
-//   //       : "Failed to update bill.";
-//   //     setError(msg);
-//   //   } finally {
-//   //     setMarkingPaid(null);
-//   //   }
-//   // };
-//   const handleMarkPaid = async (bill) => {
-//   setMarkingPaid(bill.bill_id);
-//   setError("");
-//   setSuccess("");
-
-//   try {
-//     const res = await updateMedicineBill(bill.bill_id, {
-//       ...bill,
-//       payment_status: "Paid",
-//     });
-
-//     setSuccess(`Bill #${bill.bill_id} marked as paid.`);
-//     fetchBills();
-
-//     if (selectedBill?.bill_id === bill.bill_id) {
-//       setSelectedBill(res.data || res);
-//     }
-//   } catch (err) {
-//     const msg =
-//       err?.response?.data
-//         ? JSON.stringify(err.response.data)
-//         : "Failed to update bill.";
-//     setError(msg);
-//   } finally {
-//     setMarkingPaid(null);
-//   }
-// };
-
-//   return (
-//     <PharmacistLayout title="Medicine Bills">
-//       {/* Stats */}
-//       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-//         {[
-//           { label: "Total Bills", value: bills.length, color: "text-white", icon: "🧾" },
-//           {
-//             label: "Pending Bills",
-//             value: bills.filter((b) => b.payment_status === "Pending").length,
-//             color: "text-yellow-400",
-//             icon: "⏳",
-//           },
-//           {
-//             label: "Pending Amount",
-//             value: `₹${pendingRevenue.toFixed(2)}`,
-//             color: "text-orange-400",
-//             icon: "💰",
-//           },
-//           {
-//             label: "Total Collected",
-//             value: `₹${totalRevenue.toFixed(2)}`,
-//             color: "text-green-400",
-//             icon: "✅",
-//           },
-//         ].map((stat) => (
-//           <div key={stat.label} className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-4">
-//             <div className="flex items-start justify-between">
-//               <div>
-//                 <p className={`text-xl font-bold ${stat.color}`}>
-//                   {loading ? "—" : stat.value}
-//                 </p>
-//                 <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
-//               </div>
-//               <span className="text-xl opacity-60">{stat.icon}</span>
-//             </div>
-//           </div>
-//         ))}
-//       </div>
-
-//       {error && (
-//         <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
-//           {error}
-//         </div>
-//       )}
-//       {success && (
-//         <div className="mb-4 bg-green-500/10 border border-green-500/30 text-green-400 text-sm px-4 py-3 rounded-lg">
-//           {success}
-//         </div>
-//       )}
-
-//       {/* Filter tabs */}
-//       <div className="flex gap-2 mb-4">
-//         {[
-//           { key: "all", label: "All" },
-//           { key: "Pending", label: "Pending" },
-//           { key: "Paid", label: "Paid" },
-//         ].map(({ key, label }) => (
-//           <button
-//             key={key}
-//             onClick={() => setFilter(key)}
-//             className={`px-4 py-2 rounded-xl text-sm font-medium transition ${
-//               filter === key
-//                 ? "bg-red-500/20 text-red-400 border border-red-400/40"
-//                 : "text-gray-400 hover:text-white border border-transparent hover:border-white/10"
-//             }`}
-//           >
-//             {label}
-//             <span className="ml-2 text-xs opacity-60">
-//               (
-//               {key === "all"
-//                 ? bills.length
-//                 : bills.filter((b) => b.payment_status === key).length}
-//               )
-//             </span>
-//           </button>
-//         ))}
-//       </div>
-
-//       <div className="flex flex-col md:flex-row gap-3 mb-4">
-//   <input
-//     type="text"
-//     placeholder="Search by patient name, bill id, or dispense id..."
-//     value={search}
-//     onChange={(e) => setSearch(e.target.value)}
-//     className="bg-[#0d1629] border border-[#1e2d4a] text-white text-sm rounded-xl px-4 py-2.5 focus:border-red-400/50 outline-none flex-1"
-//   />
-
-//   <select
-//     value={dateFilter}
-//     onChange={(e) => setDateFilter(e.target.value)}
-//     className="bg-[#0d1629] border border-[#1e2d4a] text-white text-sm rounded-xl px-4 py-2.5 focus:border-red-400/50 outline-none"
-//   >
-//     <option value="all">All Dates</option>
-//     <option value="today">Today</option>
-//     <option value="yesterday">Yesterday</option>
-//     <option value="week">This Week</option>
-//   </select>
-// </div>
-
-//       <div className="flex gap-6">
-//         {/* Bills table */}
-//         <div className={`${selectedBill ? "flex-1" : "w-full"} bg-[#0d1629] border border-[#1e2d4a] rounded-xl overflow-hidden`}>
-//           <div className="overflow-x-auto">
-//             <table className="min-w-full text-sm">
-//               <thead>
-//                 <tr className="border-b border-[#1e2d4a] text-gray-500 text-xs uppercase tracking-wider">
-//                   <th className="px-4 py-3 text-left">Bill #</th>
-//                   <th className="px-4 py-3 text-left">Dispense #</th>
-//                   <th className="px-4 py-3 text-left">Patient</th>
-//                   <th className="px-4 py-3 text-left">Total</th>
-//                   <th className="px-4 py-3 text-left">Discount</th>
-//                   <th className="px-4 py-3 text-left">Final</th>
-//                   <th className="px-4 py-3 text-left">Status</th>
-//                   <th className="px-4 py-3 text-left">Date</th>
-//                   <th className="px-4 py-3 text-left">Actions</th>
-//                 </tr>
-//               </thead>
-//               <tbody>
-//                 {loading ? (
-//                   [...Array(5)].map((_, i) => (
-//                     <tr key={i} className="border-b border-[#1e2d4a]">
-//                       {[...Array(8)].map((_, j) => (
-//                         <td key={j} className="px-4 py-3">
-//                           <div className="h-3 bg-[#1e2d4a] rounded animate-pulse w-16" />
-//                         </td>
-//                       ))}
-//                     </tr>
-//                   ))
-//                 ) : filteredBills.length === 0 ? (
-//                   <tr>
-//                     <td colSpan={9} className="text-center text-gray-500 py-12 text-sm">
-//                       No bills found.
-//                     </td>
-//                   </tr>
-//                 ) : (
-//                   filteredBills.map((bill) => (
-//                     <tr
-//                       key={bill.bill_id}
-//                       onClick={() =>
-//                         selectedBill?.bill_id === bill.bill_id
-//                           ? setSelectedBill(null)
-//                           : handleViewBill(bill)
-//                       }
-//                       //onClick={() => setSelectedBill(selectedBill?.bill_id === bill.bill_id ? null : bill)}
-//                       className={`border-b border-[#1e2d4a] hover:bg-[#111d35] transition-colors cursor-pointer ${
-//                         selectedBill?.bill_id === bill.bill_id ? "bg-[#111d35]" : ""
-//                       }`}
-//                     >
-//                       <td className="px-4 py-3">
-//                         <span className="font-mono text-xs text-red-400 bg-red-400/10 px-2 py-1 rounded">
-//                           #{bill.bill_id}
-//                         </span>
-//                       </td>
-//                       <td className="px-4 py-3 text-gray-400 text-xs">
-//                         #{bill.dispense || bill.dispense_id}
-//                       </td>
-//                       <td className="px-4 py-3 text-white">
-//                         {bill.patient_details?.full_name || "—"}
-//                       </td>
-//                       <td className="px-4 py-3 text-gray-300">₹{parseFloat(bill.total_amount || 0).toFixed(2)}</td>
-//                       <td className="px-4 py-3 text-gray-400">
-//                         {parseFloat(bill.discount || 0) > 0
-//                           ? `₹${parseFloat(bill.discount).toFixed(2)}`
-//                           : "—"}
-//                       </td>
-//                       <td className="px-4 py-3 text-white font-semibold">
-//                         ₹{parseFloat(bill.final_amount || 0).toFixed(2)}
-//                       </td>
-//                       <td className="px-4 py-3">
-//                         <span
-//                           className={`text-xs border px-2 py-1 rounded ${
-//                             bill.payment_status === "Paid"
-//                               ? "text-green-400 bg-green-400/10 border-green-400/30"
-//                               : "text-yellow-400 bg-yellow-400/10 border-yellow-400/30"
-//                           }`}
-//                         >
-//                           {bill.payment_status}
-//                         </span>
-//                       </td>
-//                       <td className="px-4 py-3 text-gray-400 text-xs">
-//                         {bill.created_at
-//                           ? new Date(bill.created_at).toLocaleDateString("en-IN")
-//                           : "—"}
-//                       </td>
-//                       {/* <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-//                         {bill.payment_status === "Pending" && (
-//                           <button
-//                             onClick={() => handleMarkPaid(bill)}
-//                             disabled={markingPaid === bill.bill_id}
-//                             className="text-xs text-green-400 hover:text-green-300 border border-green-400/30 px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-//                           >
-//                             {markingPaid === bill.bill_id ? "Updating..." : "Mark Paid"}
-//                           </button>
-//                         )}
-//                         {bill.payment_status === "Paid" && (
-//                           <span className="text-xs text-green-400 opacity-60">✓ Paid</span>
-//                         )}
-//                       </td> */}
-//                       <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
-//                         <div className="flex gap-2">
-//                           <button
-//                             onClick={() => handleViewBill(bill)}
-//                             className="text-xs text-blue-400 hover:text-blue-300 border border-blue-400/30 px-3 py-1.5 rounded-lg transition"
-//                           >
-//                             View
-//                           </button>
-//                           {/* {selectedBill && (
-//                           <button
-//                             onClick={() => navigate(`/pharmacist/bills/${selectedBill.bill_id}/print`)}
-//                             className={`w-full mt-4 ${
-//                               selectedBill.payment_status === "Paid"
-//                                 ? "bg-blue-500 hover:bg-blue-600"
-//                                 : "bg-yellow-500 hover:bg-yellow-600"
-//                             } text-white py-2 rounded-lg`}
-//                           >
-//                             {selectedBill.payment_status === "Paid"
-//                               ? "Print Bill"
-//                               : "Print (Unpaid)"}
-//                           </button>
-//                         )} */}
-//                           <button
-//                             onClick={() => navigate(`/pharmacist/bills/${bill.bill_id}/print`)}
-//                             className="text-xs text-blue-400 hover:text-blue-300 border border-blue-400/30 px-3 py-1.5 rounded-lg transition"
-//                           >
-//                             Print
-//                           </button>
-                    
-//                           {bill.payment_status === "Pending" ? (
-//                             <button
-//                               onClick={() => handleMarkPaid(bill)}
-//                               disabled={markingPaid === bill.bill_id}
-//                               className="text-xs text-green-400 hover:text-green-300 border border-green-400/30 px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-//                             >
-//                               {markingPaid === bill.bill_id ? "Updating..." : "Mark Paid"}
-//                             </button>
-//                           ) : (
-//                             <span className="text-xs text-green-400 opacity-70 border border-green-400/20 px-3 py-1.5 rounded-lg">
-//                               ✓ Paid
-//                             </span>
-//                           )}
-//                         </div>
-//                       </td>
-//                     </tr>
-//                   ))
-//                 )}
-//               </tbody>
-//             </table>
-//           </div>
-//         </div>
-
-//         {/* Bill Detail Panel */}
-//         {selectedBill && (
-//   <div className="w-96 flex-shrink-0">
-//     <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5 sticky top-24">
-
-//       {/* Header */}
-//       <div className="flex items-start justify-between mb-4">
-//         <div>
-//           <h3 className="text-white font-semibold">Bill Details</h3>
-//           <p className="text-xs text-gray-500 mt-1">
-//             Bill #{selectedBill.bill_id}
-//           </p>
-//         </div>
-//         <button
-//           onClick={() => setSelectedBill(null)}
-//           className="text-gray-500 hover:text-white text-sm"
-//         >
-//           ✕
-//         </button>
-//       </div>
-
-//       {/* Basic Info */}
-//       <div className="grid grid-cols-2 gap-3 text-sm mb-4">
-//         <div>
-//           <p className="text-gray-500 text-xs">Patient</p>
-//           <p className="text-white">
-//             {selectedBill.patient_details?.full_name || "—"}
-//           </p>
-//         </div>
-
-//         <div>
-//           <p className="text-gray-500 text-xs">Doctor</p>
-//           <p className="text-white">{selectedBill.doctor_name || "—"}</p>
-//         </div>
-
-//         <div>
-//           <p className="text-gray-500 text-xs">Prescription</p>
-//           <p className="text-white">{selectedBill.prescription_code || "—"}</p>
-//         </div>
-
-//         <div>
-//           <p className="text-gray-500 text-xs">Status</p>
-//           <p className={selectedBill.payment_status === "Paid" ? "text-green-400" : "text-yellow-400"}>
-//             {selectedBill.payment_status}
-//           </p>
-//         </div>
-//       </div>
-
-//       {/* Medicines */}
-//       <div className="space-y-3 mb-4">
-//         <p className="text-gray-400 text-xs uppercase">Medicines</p>
-
-//         {selectedBill.items?.map((item, idx) => (
-//           <div key={idx} className="bg-[#060d1a] border border-[#1e2d4a] rounded-lg p-3">
-
-//             <p className="text-white font-medium">{item.medicine_name}</p>
-
-//             <p className="text-xs text-gray-400">
-//               Prescribed: {item.prescribed_quantity} | Given: {item.dispensed_quantity}
-//             </p>
-
-//             {item.remaining_quantity > 0 && (
-//               <p className="text-xs text-yellow-400">
-//                 Remaining: {item.remaining_quantity}
-//               </p>
-//             )}
-
-//             {item.is_partial && (
-//               <p className="text-xs text-red-400 mt-1">
-//                 {item.note}
-//               </p>
-//             )}
-
-//             <p className="text-xs text-gray-500 mt-1">
-//               ₹{parseFloat(item.line_total || 0).toFixed(2)}
-//             </p>
-//           </div>
-//         ))}
-//       </div>
-
-//       {/* Total */}
-//       <div className="border-t border-[#1e2d4a] pt-3 space-y-2 text-sm">
-//         <div className="flex justify-between">
-//           <span className="text-gray-400">Subtotal</span>
-//           <span className="text-white">₹{selectedBill.total_amount}</span>
-//         </div>
-
-//         <div className="flex justify-between">
-//           <span className="text-gray-400">Discount</span>
-//           <span className="text-white">₹{selectedBill.discount}</span>
-//         </div>
-
-//         <div className="flex justify-between font-semibold border-t border-[#1e2d4a] pt-2">
-//           <span className="text-white">Final</span>
-//           <span className="text-red-400">₹{selectedBill.final_amount}</span>
-//         </div>
-//       </div>
-
-//       {/* ACTION BUTTON */}
-//       {selectedBill.payment_status === "Pending" ? (
-//         <button
-//           onClick={() => handleMarkPaid(selectedBill)}
-//           className="w-full mt-4 bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg"
-//         >
-//           Mark as Paid
-//         </button>
-//       ) : (
-//         <div className="mt-4 text-center text-green-400 text-sm">
-//           ✓ Already Paid
-//         </div>
-//       )}
-//     </div>
-//   </div>
-// )}
-//         {/* {selectedBill && (
-//           <div className="w-72 flex-shrink-0">
-//             <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5">
-//               <div className="flex items-center justify-between mb-4">
-//                 <h3 className="text-white font-semibold text-sm">Bill Details</h3>
-//                 <button
-//                   onClick={() => setSelectedBill(null)}
-//                   className="text-gray-500 hover:text-white text-xs transition"
-//                 >
-//                   ✕
-//                 </button>
-//               </div>
-//               <div className="space-y-3 text-sm">
-//                 <div className="flex justify-between">
-//                   <span className="text-gray-400">Bill ID</span>
-//                   <span className="font-mono text-red-400">#{selectedBill.bill_id}</span>
-//                 </div>
-//                 <div className="flex justify-between">
-//                   <span className="text-gray-400">Dispense</span>
-//                   <span className="text-gray-300">#{selectedBill.dispense || selectedBill.dispense_id}</span>
-//                 </div>
-//                 <div className="border-t border-[#1e2d4a] pt-3 space-y-2">
-//                   <div className="flex justify-between">
-//                     <span className="text-gray-400">Subtotal</span>
-//                     <span className="text-white">₹{parseFloat(selectedBill.total_amount || 0).toFixed(2)}</span>
-//                   </div>
-//                   <div className="flex justify-between">
-//                     <span className="text-gray-400">Discount</span>
-//                     <span className="text-gray-300">
-//                       {parseFloat(selectedBill.discount || 0) > 0
-//                         ? `-₹${parseFloat(selectedBill.discount).toFixed(2)}`
-//                         : "—"}
-//                     </span>
-//                   </div>
-//                   <div className="flex justify-between border-t border-[#1e2d4a] pt-2">
-//                     <span className="text-white font-semibold">Final Amount</span>
-//                     <span className="text-red-400 font-bold text-lg">
-//                       ₹{parseFloat(selectedBill.final_amount || 0).toFixed(2)}
-//                     </span>
-//                   </div>
-//                 </div>
-//                 <div className="flex justify-between items-center">
-//                   <span className="text-gray-400">Status</span>
-//                   <span
-//                     className={`text-xs border px-2 py-1 rounded ${
-//                       selectedBill.payment_status === "Paid"
-//                         ? "text-green-400 bg-green-400/10 border-green-400/30"
-//                         : "text-yellow-400 bg-yellow-400/10 border-yellow-400/30"
-//                     }`}
-//                   >
-//                     {selectedBill.payment_status}
-//                   </span>
-//                 </div>
-//                 {selectedBill.created_at && (
-//                   <div className="flex justify-between">
-//                     <span className="text-gray-400">Date</span>
-//                     <span className="text-gray-300 text-xs">
-//                       {new Date(selectedBill.created_at).toLocaleString("en-IN")}
-//                     </span>
-//                   </div>
-//                 )}
-//               </div>
-
-//               {selectedBill.payment_status === "Pending" && (
-//                 <button
-//                   onClick={() => handleMarkPaid(selectedBill)}
-//                   disabled={markingPaid === selectedBill.bill_id}
-//                   className="mt-4 w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-2.5 rounded-xl text-sm font-semibold transition"
-//                 >
-//                   {markingPaid === selectedBill.bill_id ? "Processing..." : "✓ Mark as Paid"}
-//                 </button>
-//               )}
-//             </div>
-//           </div>
-//         )} */}
-//       </div>
-//     </PharmacistLayout>
-//   );
-// };
-
-// export default BillsPage;
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PharmacistLayout from "../components/PharmacistLayout";
+
 import {
   getMedicineBills,
   getMedicineBillDetail,
   updateMedicineBill,
 } from "../api/pharmacistApi";
 
-// ─── BILLS PAGE ───────────────────────────────────────────────────────────────
 const BillsPage = () => {
   const [bills, setBills] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [filter, setFilter] = useState("all"); // "all" | "Pending" | "Paid"
+  const [filter, setFilter] = useState("all");
   const [markingPaid, setMarkingPaid] = useState(null);
   const [selectedBill, setSelectedBill] = useState(null);
-  const [dateFilter, setDateFilter] = useState("all"); // all | today | yesterday | week
+  const [dateFilter, setDateFilter] = useState("all");
   const [search, setSearch] = useState("");
 
   const navigate = useNavigate();
 
+  // ==============================
+  // FETCH BILLS
+  // ==============================
+
   const fetchBills = () => {
     setLoading(true);
+
     getMedicineBills()
       .then((res) => setBills(res.results || res.data || []))
       .catch(() => setError("Failed to load bills."))
@@ -642,6 +36,7 @@ const BillsPage = () => {
 
   const handleViewBill = async (bill) => {
     setError("");
+
     try {
       const res = await getMedicineBillDetail(bill.bill_id);
       const fullBill = res.data || res;
@@ -655,35 +50,49 @@ const BillsPage = () => {
     fetchBills();
   }, []);
 
+  // ==============================
+  // DATE FILTER HELPERS
+  // ==============================
+
   const isToday = (dateString) => {
     if (!dateString) return false;
+
     const d = new Date(dateString);
     const today = new Date();
+
     return d.toDateString() === today.toDateString();
   };
 
   const isYesterday = (dateString) => {
     if (!dateString) return false;
+
     const d = new Date(dateString);
     const yesterday = new Date();
+
     yesterday.setDate(yesterday.getDate() - 1);
+
     return d.toDateString() === yesterday.toDateString();
   };
 
   const isThisWeek = (dateString) => {
     if (!dateString) return false;
+
     const d = new Date(dateString);
     const now = new Date();
 
     const startOfWeek = new Date(now);
     startOfWeek.setHours(0, 0, 0, 0);
-    startOfWeek.setDate(now.getDate() - now.getDay()); // Sunday start
+    startOfWeek.setDate(now.getDate() - now.getDay());
 
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 7);
 
     return d >= startOfWeek && d < endOfWeek;
   };
+
+  // ==============================
+  // FILTER BILLS
+  // ==============================
 
   const filteredBills = bills.filter((bill) => {
     const paymentMatch =
@@ -702,9 +111,13 @@ const BillsPage = () => {
 
     const patientName =
       bill.patient_details?.full_name?.toLowerCase() || "";
-    const dispenseId =
-      String(bill.dispense || bill.dispense_id || "").toLowerCase();
+
+    const dispenseId = String(
+      bill.dispense || bill.dispense_id || ""
+    ).toLowerCase();
+
     const billId = String(bill.bill_id || "").toLowerCase();
+
     const q = search.trim().toLowerCase();
 
     const searchMatch =
@@ -716,13 +129,27 @@ const BillsPage = () => {
     return paymentMatch && dateMatch && searchMatch;
   });
 
+  // ==============================
+  // REVENUE CALCULATIONS
+  // ==============================
+
   const totalRevenue = bills
     .filter((b) => b.payment_status === "Paid")
-    .reduce((sum, b) => sum + parseFloat(b.final_amount || 0), 0);
+    .reduce(
+      (sum, b) => sum + parseFloat(b.final_amount || 0),
+      0
+    );
 
   const pendingRevenue = bills
     .filter((b) => b.payment_status === "Pending")
-    .reduce((sum, b) => sum + parseFloat(b.final_amount || 0), 0);
+    .reduce(
+      (sum, b) => sum + parseFloat(b.final_amount || 0),
+      0
+    );
+
+  // ==============================
+  // MARK BILL AS PAID
+  // ==============================
 
   const handleMarkPaid = async (bill) => {
     setMarkingPaid(bill.bill_id);
@@ -742,10 +169,10 @@ const BillsPage = () => {
         setSelectedBill(res.data || res);
       }
     } catch (err) {
-      const msg =
-        err?.response?.data
-          ? JSON.stringify(err.response.data)
-          : "Failed to update bill.";
+      const msg = err?.response?.data
+        ? JSON.stringify(err.response.data)
+        : "Failed to update bill.";
+
       setError(msg);
     } finally {
       setMarkingPaid(null);
@@ -754,407 +181,483 @@ const BillsPage = () => {
 
   return (
     <PharmacistLayout title="Medicine Bills">
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-6">
-        {[
-          {
-            label: "Total Bills",
-            value: bills.length,
-            valueClass: "text-gray-900",
-            icon: "🧾",
-            iconBg: "bg-[#eef7f2]",
-          },
-          {
-            label: "Pending Bills",
-            value: bills.filter((b) => b.payment_status === "Pending").length,
-            valueClass: "text-amber-600",
-            icon: "⏳",
-            iconBg: "bg-amber-50",
-          },
-          {
-            label: "Pending Amount",
-            value: `₹${pendingRevenue.toFixed(2)}`,
-            valueClass: "text-orange-600",
-            icon: "💰",
-            iconBg: "bg-orange-50",
-          },
-          {
-            label: "Total Collected",
-            value: `₹${totalRevenue.toFixed(2)}`,
-            valueClass: "text-[#15803d]",
-            icon: "✅",
-            iconBg: "bg-[#eef7f2]",
-          },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="bg-white border border-[#e3ece8] rounded-2xl p-5 shadow-sm"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className={`text-2xl font-bold ${stat.valueClass}`}>
-                  {loading ? "—" : stat.value}
-                </p>
-                <p className="text-sm text-gray-500 mt-2">{stat.label}</p>
-              </div>
-              <span
-                className={`text-xl rounded-xl p-2.5 ${stat.iconBg} border border-[#e7f1ed]`}
-              >
-                {stat.icon}
-              </span>
-            </div>
-          </div>
-        ))}
-      </div>
+      <div className="w-full min-w-0">
 
-      {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-xl">
-          {error}
-        </div>
-      )}
+        {/* ============================== */}
+        {/* STATISTICS */}
+        {/* ============================== */}
 
-      {success && (
-        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-3 rounded-xl">
-          {success}
-        </div>
-      )}
-
-      {/* Filter tabs */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {[
-          { key: "all", label: "All" },
-          { key: "Pending", label: "Pending" },
-          { key: "Paid", label: "Paid" },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setFilter(key)}
-            className={`px-4 py-2.5 rounded-xl text-sm font-medium transition border ${
-              filter === key
-                ? "bg-[#e8f5ee] text-[#15803d] border-[#bfe3cd]"
-                : "bg-white text-gray-600 border-[#e3ece8] hover:bg-[#f6fbf8] hover:text-[#15803d]"
-            }`}
-          >
-            {label}
-            <span className="ml-2 text-xs opacity-70">
-              (
-              {key === "all"
-                ? bills.length
-                : bills.filter((b) => b.payment_status === key).length}
-              )
-            </span>
-          </button>
-        ))}
-      </div>
-
-      {/* Search + Date Filter */}
-      <div className="flex flex-col md:flex-row gap-3 mb-5">
-        <input
-          type="text"
-          placeholder="Search by patient name, bill id, or dispense id..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="bg-white border border-[#dbe7e2] text-gray-800 placeholder:text-gray-400 text-base rounded-xl px-4 py-3 outline-none focus:border-[#86c8a3] flex-1"
-        />
-
-        <select
-          value={dateFilter}
-          onChange={(e) => setDateFilter(e.target.value)}
-          className="bg-white border border-[#dbe7e2] text-gray-800 text-base rounded-xl px-4 py-3 outline-none focus:border-[#86c8a3]"
-        >
-          <option value="all">All Dates</option>
-          <option value="today">Today</option>
-          <option value="yesterday">Yesterday</option>
-          <option value="week">This Week</option>
-        </select>
-      </div>
-
-      <div className="flex flex-col xl:flex-row gap-6">
-        {/* Bills table */}
-        <div
-          className={`${
-            selectedBill ? "flex-1" : "w-full"
-          } bg-white border border-[#e3ece8] rounded-2xl overflow-hidden shadow-sm`}
-        >
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
-              <thead>
-                <tr className="bg-[#f7faf8] border-b border-[#e3ece8] text-gray-500 text-xs uppercase tracking-wider">
-                  <th className="px-5 py-4 text-left">Bill #</th>
-                  <th className="px-5 py-4 text-left">Dispense #</th>
-                  <th className="px-5 py-4 text-left">Patient</th>
-                  <th className="px-5 py-4 text-left">Total</th>
-                  <th className="px-5 py-4 text-left">Discount</th>
-                  <th className="px-5 py-4 text-left">Final</th>
-                  <th className="px-5 py-4 text-left">Status</th>
-                  <th className="px-5 py-4 text-left">Date</th>
-                  <th className="px-5 py-4 text-left">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {loading ? (
-                  [...Array(5)].map((_, i) => (
-                    <tr key={i} className="border-b border-[#edf3f0]">
-                      {[...Array(8)].map((_, j) => (
-                        <td key={j} className="px-5 py-4">
-                          <div className="h-3 bg-[#edf3f0] rounded animate-pulse w-16" />
-                        </td>
-                      ))}
-                    </tr>
-                  ))
-                ) : filteredBills.length === 0 ? (
-                  <tr>
-                    <td
-                      colSpan={9}
-                      className="text-center text-gray-500 py-14 text-base"
-                    >
-                      No bills found.
-                    </td>
-                  </tr>
-                ) : (
-                  filteredBills.map((bill) => (
-                    <tr
-                      key={bill.bill_id}
-                      onClick={() =>
-                        selectedBill?.bill_id === bill.bill_id
-                          ? setSelectedBill(null)
-                          : handleViewBill(bill)
-                      }
-                      className={`border-b border-[#edf3f0] transition-colors cursor-pointer ${
-                        selectedBill?.bill_id === bill.bill_id
-                          ? "bg-[#f2faf5]"
-                          : "hover:bg-[#f8fcf9]"
-                      }`}
-                    >
-                      <td className="px-5 py-4">
-                        <span className="font-mono text-xs text-[#15803d] bg-[#e8f5ee] px-2.5 py-1 rounded-md border border-[#cfe8d9]">
-                          #{bill.bill_id}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4 text-gray-500 text-sm">
-                        #{bill.dispense || bill.dispense_id}
-                      </td>
-
-                      <td className="px-5 py-4 text-gray-900 text-base font-medium">
-                        {bill.patient_details?.full_name || "—"}
-                      </td>
-
-                      <td className="px-5 py-4 text-gray-700 text-sm">
-                        ₹{parseFloat(bill.total_amount || 0).toFixed(2)}
-                      </td>
-
-                      <td className="px-5 py-4 text-gray-500 text-sm">
-                        {parseFloat(bill.discount || 0) > 0
-                          ? `₹${parseFloat(bill.discount).toFixed(2)}`
-                          : "—"}
-                      </td>
-
-                      <td className="px-5 py-4 text-gray-900 font-semibold text-sm">
-                        ₹{parseFloat(bill.final_amount || 0).toFixed(2)}
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span
-                          className={`text-xs border px-2.5 py-1 rounded-full font-medium ${
-                            bill.payment_status === "Paid"
-                              ? "text-green-700 bg-green-50 border-green-200"
-                              : "text-amber-700 bg-amber-50 border-amber-200"
-                          }`}
-                        >
-                          {bill.payment_status}
-                        </span>
-                      </td>
-
-                      <td className="px-5 py-4 text-gray-500 text-sm">
-                        {bill.created_at
-                          ? new Date(bill.created_at).toLocaleDateString("en-IN")
-                          : "—"}
-                      </td>
-
-                      <td
-                        className="px-5 py-4"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div className="flex flex-wrap gap-2">
-                          <button
-                            onClick={() => handleViewBill(bill)}
-                            className="text-xs text-[#166534] hover:text-[#14532d] border border-[#cfe8d9] bg-[#f7fcf9] px-3 py-1.5 rounded-lg transition"
-                          >
-                            View
-                          </button>
-
-                          <button
-                            onClick={() =>
-                              navigate(`/pharmacist/bills/${bill.bill_id}/print`)
-                            }
-                            className="text-xs text-[#166534] hover:text-[#14532d] border border-[#cfe8d9] bg-[#f7fcf9] px-3 py-1.5 rounded-lg transition"
-                          >
-                            Print
-                          </button>
-
-                          {bill.payment_status === "Pending" ? (
-                            <button
-                              onClick={() => handleMarkPaid(bill)}
-                              disabled={markingPaid === bill.bill_id}
-                              className="text-xs text-white bg-[#16a34a] hover:bg-[#15803d] px-3 py-1.5 rounded-lg transition disabled:opacity-50"
-                            >
-                              {markingPaid === bill.bill_id
-                                ? "Updating..."
-                                : "Mark Paid"}
-                            </button>
-                          ) : (
-                            <span className="text-xs text-green-700 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg">
-                              ✓ Paid
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Bill Detail Panel */}
-        {selectedBill && (
-          <div className="w-full xl:w-96 flex-shrink-0">
-            <div className="bg-white border border-[#e3ece8] rounded-2xl p-5 sticky top-24 shadow-sm">
-              {/* Header */}
-              <div className="flex items-start justify-between mb-5">
-                <div>
-                  <h3 className="text-gray-900 font-semibold text-lg">
-                    Bill Details
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">
-                    Bill #{selectedBill.bill_id}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setSelectedBill(null)}
-                  className="text-gray-400 hover:text-gray-700 text-sm"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {/* Basic Info */}
-              <div className="grid grid-cols-2 gap-4 text-sm mb-5">
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">Patient</p>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {selectedBill.patient_details?.full_name || "—"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">Doctor</p>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {selectedBill.doctor_name || "—"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">Prescription</p>
-                  <p className="text-gray-900 text-sm font-medium">
-                    {selectedBill.prescription_code || "—"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-gray-500 text-xs mb-1">Status</p>
+        <div className="mb-6 grid grid-cols-1 gap-4 min-[400px]:grid-cols-2 xl:grid-cols-4">
+          {[
+            {
+              label: "Total Bills",
+              value: bills.length,
+              valueClass: "text-white",
+              icon: "🧾",
+            },
+            {
+              label: "Pending Bills",
+              value: bills.filter(
+                (b) => b.payment_status === "Pending"
+              ).length,
+              valueClass: "text-amber-400",
+              icon: "⏳",
+            },
+            {
+              label: "Pending Amount",
+              value: `₹${pendingRevenue.toFixed(2)}`,
+              valueClass: "text-orange-400",
+              icon: "💰",
+            },
+            {
+              label: "Total Collected",
+              value: `₹${totalRevenue.toFixed(2)}`,
+              valueClass: "text-green-400",
+              icon: "✅",
+            },
+          ].map((stat) => (
+            <div
+              key={stat.label}
+              className="min-w-0 rounded-xl border border-[#1e2d4a] bg-[#0d1629] p-4 transition-colors hover:border-[#344766] sm:p-5"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
                   <p
-                    className={`text-sm font-medium ${
-                      selectedBill.payment_status === "Paid"
-                        ? "text-green-700"
-                        : "text-amber-700"
-                    }`}
+                    className={`break-words text-2xl font-bold sm:text-3xl ${stat.valueClass}`}
                   >
-                    {selectedBill.payment_status}
+                    {loading ? "—" : stat.value}
+                  </p>
+
+                  <p className="mt-2 text-xs text-gray-400 sm:text-sm">
+                    {stat.label}
                   </p>
                 </div>
-              </div>
 
-              {/* Medicines */}
-              <div className="space-y-3 mb-5">
-                <p className="text-gray-500 text-xs uppercase tracking-wide">
-                  Medicines
-                </p>
-
-                {selectedBill.items?.map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-[#f8fbf9] border border-[#e3ece8] rounded-xl p-3.5"
-                  >
-                    <p className="text-gray-900 font-medium text-sm">
-                      {item.medicine_name}
-                    </p>
-
-                    <p className="text-sm text-gray-500 mt-1">
-                      Prescribed: {item.prescribed_quantity} | Given:{" "}
-                      {item.dispensed_quantity}
-                    </p>
-
-                    {item.remaining_quantity > 0 && (
-                      <p className="text-sm text-amber-700 mt-1">
-                        Remaining: {item.remaining_quantity}
-                      </p>
-                    )}
-
-                    {item.is_partial && (
-                      <p className="text-sm text-red-600 mt-1">{item.note}</p>
-                    )}
-
-                    <p className="text-sm text-gray-500 mt-2">
-                      ₹{parseFloat(item.line_total || 0).toFixed(2)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Total */}
-              <div className="border-t border-[#e3ece8] pt-4 space-y-2.5 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Subtotal</span>
-                  <span className="text-gray-900 font-medium">
-                    ₹{selectedBill.total_amount}
-                  </span>
-                </div>
-
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Discount</span>
-                  <span className="text-gray-900 font-medium">
-                    ₹{selectedBill.discount}
-                  </span>
-                </div>
-
-                <div className="flex justify-between font-semibold border-t border-[#e3ece8] pt-3">
-                  <span className="text-gray-900">Final</span>
-                  <span className="text-[#15803d] text-base">
-                    ₹{selectedBill.final_amount}
-                  </span>
-                </div>
-              </div>
-
-              {/* ACTION BUTTON */}
-              {selectedBill.payment_status === "Pending" ? (
-                <button
-                  onClick={() => handleMarkPaid(selectedBill)}
-                  className="w-full mt-5 bg-[#16a34a] hover:bg-[#15803d] text-white py-2.5 rounded-xl text-sm font-medium transition"
+                <span
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white/5 text-xl"
+                  aria-hidden="true"
                 >
-                  Mark as Paid
-                </button>
-              ) : (
-                <div className="mt-5 text-center text-green-700 bg-green-50 border border-green-200 text-sm py-2.5 rounded-xl">
-                  ✓ Already Paid
-                </div>
-              )}
+                  {stat.icon}
+                </span>
+              </div>
             </div>
+          ))}
+        </div>
+
+        {/* ============================== */}
+        {/* MESSAGES */}
+        {/* ============================== */}
+
+        {error && (
+          <div className="mb-4 break-words rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {error}
           </div>
         )}
+
+        {success && (
+          <div className="mb-4 break-words rounded-xl border border-green-400/30 bg-green-400/10 px-4 py-3 text-sm text-green-300">
+            {success}
+          </div>
+        )}
+
+        {/* ============================== */}
+        {/* PAYMENT FILTER TABS */}
+        {/* ============================== */}
+
+        <div className="mb-4 flex flex-wrap gap-2">
+          {[
+            { key: "all", label: "All" },
+            { key: "Pending", label: "Pending" },
+            { key: "Paid", label: "Paid" },
+          ].map(({ key, label }) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setFilter(key)}
+              className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
+                filter === key
+                  ? "border-red-400/40 bg-red-400/15 text-red-300"
+                  : "border-[#26344c] bg-[#0d1629] text-gray-400 hover:bg-white/5 hover:text-white"
+              }`}
+            >
+              {label}
+
+              <span className="ml-2 text-xs opacity-70">
+                (
+                {key === "all"
+                  ? bills.length
+                  : bills.filter(
+                      (b) => b.payment_status === key
+                    ).length}
+                )
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* ============================== */}
+        {/* SEARCH AND DATE FILTER */}
+        {/* ============================== */}
+
+        <div className="mb-5 flex min-w-0 flex-col gap-3 md:flex-row">
+          <input
+            type="text"
+            placeholder="Search by patient name, bill id, or dispense id..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full min-w-0 flex-1 rounded-xl border border-[#26344c] bg-[#0d1629] px-4 py-3 text-sm text-white placeholder:text-gray-500 outline-none transition focus:border-red-400 sm:text-base"
+          />
+
+          <select
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="w-full rounded-xl border border-[#26344c] bg-[#0d1629] px-4 py-3 text-sm text-white outline-none transition focus:border-red-400 md:w-48 sm:text-base"
+          >
+            <option value="all">All Dates</option>
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="week">This Week</option>
+          </select>
+        </div>
+
+        {/* ============================== */}
+        {/* TABLE AND DETAIL PANEL */}
+        {/* ============================== */}
+
+        <div className="flex min-w-0 flex-col gap-6 xl:flex-row xl:items-start">
+
+          {/* BILLS TABLE */}
+
+          <div
+            className={`min-w-0 overflow-hidden rounded-xl border border-[#1e2d4a] bg-[#0d1629] ${
+              selectedBill ? "w-full xl:flex-1" : "w-full"
+            }`}
+          >
+            <div className="w-full max-w-full overflow-x-auto">
+              <table className="w-full min-w-[1100px] text-sm">
+                <thead>
+                  <tr className="border-b border-[#1e2d4a] bg-[#101c30] text-xs uppercase tracking-wider text-gray-400">
+                    <th className="px-4 py-4 text-left">Bill #</th>
+                    <th className="px-4 py-4 text-left">Dispense #</th>
+                    <th className="px-4 py-4 text-left">Patient</th>
+                    <th className="px-4 py-4 text-left">Total</th>
+                    <th className="px-4 py-4 text-left">Discount</th>
+                    <th className="px-4 py-4 text-left">Final</th>
+                    <th className="px-4 py-4 text-left">Status</th>
+                    <th className="px-4 py-4 text-left">Date</th>
+                    <th className="px-4 py-4 text-left">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {loading ? (
+                    [...Array(5)].map((_, i) => (
+                      <tr
+                        key={i}
+                        className="border-b border-[#1e2d4a]"
+                      >
+                        {[...Array(9)].map((_, j) => (
+                          <td key={j} className="px-4 py-4">
+                            <div className="h-3 w-16 animate-pulse rounded bg-[#1e2d4a]" />
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : filteredBills.length === 0 ? (
+                    <tr>
+                      <td
+                        colSpan={9}
+                        className="px-4 py-14 text-center text-sm text-gray-400"
+                      >
+                        No bills found.
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredBills.map((bill) => (
+                      <tr
+                        key={bill.bill_id}
+                        onClick={() =>
+                          selectedBill?.bill_id === bill.bill_id
+                            ? setSelectedBill(null)
+                            : handleViewBill(bill)
+                        }
+                        className={`cursor-pointer border-b border-[#1e2d4a] transition-colors ${
+                          selectedBill?.bill_id === bill.bill_id
+                            ? "bg-red-400/10"
+                            : "hover:bg-[#111d35]"
+                        }`}
+                      >
+                        <td className="px-4 py-4">
+                          <span className="inline-block whitespace-nowrap rounded-md border border-red-400/20 bg-red-400/10 px-2.5 py-1 font-mono text-xs text-red-300">
+                            #{bill.bill_id}
+                          </span>
+                        </td>
+
+                        <td className="whitespace-nowrap px-4 py-4 text-gray-400">
+                          #{bill.dispense || bill.dispense_id}
+                        </td>
+
+                        <td className="px-4 py-4 font-medium text-white">
+                          {bill.patient_details?.full_name || "—"}
+                        </td>
+
+                        <td className="whitespace-nowrap px-4 py-4 text-gray-300">
+                          ₹{parseFloat(bill.total_amount || 0).toFixed(2)}
+                        </td>
+
+                        <td className="whitespace-nowrap px-4 py-4 text-gray-400">
+                          {parseFloat(bill.discount || 0) > 0
+                            ? `₹${parseFloat(bill.discount).toFixed(2)}`
+                            : "—"}
+                        </td>
+
+                        <td className="whitespace-nowrap px-4 py-4 font-semibold text-white">
+                          ₹{parseFloat(bill.final_amount || 0).toFixed(2)}
+                        </td>
+
+                        <td className="px-4 py-4">
+                          <span
+                            className={`inline-block whitespace-nowrap rounded-full border px-2.5 py-1 text-xs font-medium ${
+                              bill.payment_status === "Paid"
+                                ? "border-green-400/30 bg-green-400/10 text-green-300"
+                                : "border-amber-400/30 bg-amber-400/10 text-amber-300"
+                            }`}
+                          >
+                            {bill.payment_status}
+                          </span>
+                        </td>
+
+                        <td className="whitespace-nowrap px-4 py-4 text-gray-400">
+                          {bill.created_at
+                            ? new Date(
+                                bill.created_at
+                              ).toLocaleDateString("en-IN")
+                            : "—"}
+                        </td>
+
+                        <td
+                          className="px-4 py-4"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <div className="flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleViewBill(bill)}
+                              className="rounded-lg border border-[#344766] bg-white/5 px-3 py-2 text-xs text-gray-200 transition hover:bg-white/10"
+                            >
+                              View
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate(
+                                  `/pharmacist/bills/${bill.bill_id}/print`
+                                )
+                              }
+                              className="rounded-lg border border-[#344766] bg-white/5 px-3 py-2 text-xs text-gray-200 transition hover:bg-white/10"
+                            >
+                              Print
+                            </button>
+
+                            {bill.payment_status === "Pending" ? (
+                              <button
+                                type="button"
+                                onClick={() => handleMarkPaid(bill)}
+                                disabled={markingPaid === bill.bill_id}
+                                className="rounded-lg bg-red-500 px-3 py-2 text-xs font-medium text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                              >
+                                {markingPaid === bill.bill_id
+                                  ? "Updating..."
+                                  : "Mark Paid"}
+                              </button>
+                            ) : (
+                              <span className="rounded-lg border border-green-400/30 bg-green-400/10 px-3 py-2 text-xs text-green-300">
+                                ✓ Paid
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* ============================== */}
+          {/* BILL DETAIL PANEL */}
+          {/* ============================== */}
+
+          {selectedBill && (
+            <div className="w-full min-w-0 shrink-0 xl:w-80 2xl:w-96">
+              <div className="rounded-xl border border-[#1e2d4a] bg-[#0d1629] p-4 sm:p-5 xl:sticky xl:top-24">
+
+                {/* HEADER */}
+
+                <div className="mb-5 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-semibold text-white">
+                      Bill Details
+                    </h3>
+
+                    <p className="mt-1 text-sm text-gray-400">
+                      Bill #{selectedBill.bill_id}
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedBill(null)}
+                    className="shrink-0 rounded-lg px-2 py-1 text-sm text-gray-400 transition hover:bg-white/10 hover:text-white"
+                    aria-label="Close bill details"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                {/* BASIC INFORMATION */}
+
+                <div className="mb-5 grid grid-cols-1 gap-4 min-[400px]:grid-cols-2">
+                  <div className="min-w-0">
+                    <p className="mb-1 text-xs text-gray-500">
+                      Patient
+                    </p>
+                    <p className="break-words text-sm font-medium text-white">
+                      {selectedBill.patient_details?.full_name || "—"}
+                    </p>
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="mb-1 text-xs text-gray-500">
+                      Doctor
+                    </p>
+                    <p className="break-words text-sm font-medium text-white">
+                      {selectedBill.doctor_name || "—"}
+                    </p>
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="mb-1 text-xs text-gray-500">
+                      Prescription
+                    </p>
+                    <p className="break-words text-sm font-medium text-white">
+                      {selectedBill.prescription_code || "—"}
+                    </p>
+                  </div>
+
+                  <div className="min-w-0">
+                    <p className="mb-1 text-xs text-gray-500">
+                      Status
+                    </p>
+                    <p
+                      className={`text-sm font-medium ${
+                        selectedBill.payment_status === "Paid"
+                          ? "text-green-400"
+                          : "text-amber-400"
+                      }`}
+                    >
+                      {selectedBill.payment_status}
+                    </p>
+                  </div>
+                </div>
+
+                {/* MEDICINES */}
+
+                <div className="mb-5 space-y-3">
+                  <p className="text-xs uppercase tracking-wide text-gray-500">
+                    Medicines
+                  </p>
+
+                  {selectedBill.items?.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="min-w-0 rounded-xl border border-[#26344c] bg-[#101c30] p-3.5"
+                    >
+                      <p className="break-words text-sm font-medium text-white">
+                        {item.medicine_name}
+                      </p>
+
+                      <p className="mt-1 text-sm text-gray-400">
+                        Prescribed: {item.prescribed_quantity} | Given:{" "}
+                        {item.dispensed_quantity}
+                      </p>
+
+                      {item.remaining_quantity > 0 && (
+                        <p className="mt-1 text-sm text-amber-400">
+                          Remaining: {item.remaining_quantity}
+                        </p>
+                      )}
+
+                      {item.is_partial && (
+                        <p className="mt-1 break-words text-sm text-red-400">
+                          {item.note}
+                        </p>
+                      )}
+
+                      <p className="mt-2 text-sm text-gray-400">
+                        ₹{parseFloat(item.line_total || 0).toFixed(2)}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* TOTALS */}
+
+                <div className="space-y-2.5 border-t border-[#26344c] pt-4 text-sm">
+                  <div className="flex justify-between gap-3">
+                    <span className="text-gray-400">
+                      Subtotal
+                    </span>
+                    <span className="font-medium text-white">
+                      ₹{selectedBill.total_amount}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between gap-3">
+                    <span className="text-gray-400">
+                      Discount
+                    </span>
+                    <span className="font-medium text-white">
+                      ₹{selectedBill.discount}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between gap-3 border-t border-[#26344c] pt-3 font-semibold">
+                    <span className="text-white">
+                      Final
+                    </span>
+                    <span className="break-all text-base text-red-300">
+                      ₹{selectedBill.final_amount}
+                    </span>
+                  </div>
+                </div>
+
+                {/* PAYMENT ACTION */}
+
+                {selectedBill.payment_status === "Pending" ? (
+                  <button
+                    type="button"
+                    onClick={() => handleMarkPaid(selectedBill)}
+                    disabled={
+                      markingPaid === selectedBill.bill_id
+                    }
+                    className="mt-5 w-full rounded-xl bg-red-500 py-3 text-sm font-medium text-white transition hover:bg-red-400 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {markingPaid === selectedBill.bill_id
+                      ? "Updating..."
+                      : "Mark as Paid"}
+                  </button>
+                ) : (
+                  <div className="mt-5 rounded-xl border border-green-400/30 bg-green-400/10 py-3 text-center text-sm text-green-300">
+                    ✓ Already Paid
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </PharmacistLayout>
   );

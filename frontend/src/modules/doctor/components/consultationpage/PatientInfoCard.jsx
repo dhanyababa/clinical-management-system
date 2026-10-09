@@ -5,7 +5,7 @@ const PatientInfoCard = ({ patient, appointment }) => {
   if (!patient || !appointment) return null;
 
   return (
-    <div className="h-full flex flex-col bg-[#1e293b] border border-white/10 rounded-xl p-4 md:p-5 text-white">
+    <div className="w-full min-w-0 h-full flex flex-col bg-[#1e293b] border border-white/10 rounded-xl p-3 sm:p-4 lg:p-5 text-white">
 
       {/* Title */}
       <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -13,55 +13,79 @@ const PatientInfoCard = ({ patient, appointment }) => {
         Patient Info
       </h2>
 
-      {/* 🔥 Content */}
-      <div className="flex-1 flex flex-col text-sm md:text-base">
+      {/* Content */}
+      <div className="flex-1 min-w-0 flex flex-col text-sm sm:text-base">
 
-        {/* All fields */}
         <div className="flex flex-col gap-3">
 
-          <div className="flex justify-between">
-            <span className="text-gray-400">Name</span>
-            <span className="font-medium text-right">
+          {/* Name */}
+          <div className="flex justify-between gap-3 min-w-0">
+            <span className="text-gray-400 shrink-0">Name</span>
+
+            <span className="font-medium text-right break-words min-w-0">
               {patient.first_name} {patient.last_name}
             </span>
           </div>
 
-          <div className="flex justify-between">
-            <span className="text-gray-400">Gender / Age</span>
-            <span>
+          {/* Gender / Age */}
+          <div className="flex justify-between gap-3 min-w-0">
+            <span className="text-gray-400 shrink-0">
+              Gender / Age
+            </span>
+
+            <span className="text-right min-w-0 break-words">
               {patient.gender} / {patient.age}
             </span>
           </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400 flex items-center gap-1">
+          {/* Phone */}
+          <div className="flex justify-between items-center gap-3 min-w-0">
+            <span className="text-gray-400 flex items-center gap-1 shrink-0">
               <FaPhone className="text-xs opacity-70" />
               Phone
             </span>
-            <span>{patient.phone}</span>
+
+            <span className="text-right break-all min-w-0">
+              {patient.phone}
+            </span>
           </div>
 
-          <div className="flex justify-between">
-            <span className="text-gray-400">Blood</span>
-            <span>{patient.blood_group || "N/A"}</span>
+          {/* Blood */}
+          <div className="flex justify-between gap-3 min-w-0">
+            <span className="text-gray-400 shrink-0">Blood</span>
+
+            <span className="text-right">
+              {patient.blood_group || "N/A"}
+            </span>
           </div>
 
-          <div className="flex justify-between">
-            <span className="text-gray-400">Token</span>
-            <span>{appointment.token_number}</span>
+          {/* Token */}
+          <div className="flex justify-between gap-3 min-w-0">
+            <span className="text-gray-400 shrink-0">Token</span>
+
+            <span className="text-right">
+              {appointment.token_number}
+            </span>
           </div>
 
-          <div className="flex justify-between items-center">
-            <span className="text-gray-400 flex items-center gap-1">
+          {/* Time */}
+          <div className="flex justify-between items-center gap-3 min-w-0">
+            <span className="text-gray-400 flex items-center gap-1 shrink-0">
               <FaClock className="text-xs opacity-70" />
               Time
             </span>
-            <span>{appointment.appointment_time}</span>
+
+            <span className="text-right break-words min-w-0">
+              {appointment.appointment_time}
+            </span>
           </div>
 
-          {/* ✅ STATUS NOW JUST BELOW */}
-          <div className="flex justify-between items-center pt-2">
-            <span className="text-gray-400">Status</span>
+          {/* Status */}
+          <div className="flex justify-between items-center gap-3 pt-2 min-w-0">
+            <span className="text-gray-400 shrink-0">
+              Status
+            </span>
+
             <span
               className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                 appointment.status === "Completed"
@@ -74,7 +98,6 @@ const PatientInfoCard = ({ patient, appointment }) => {
           </div>
 
         </div>
-
       </div>
     </div>
   );

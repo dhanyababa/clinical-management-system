@@ -13,11 +13,9 @@ const ActionPanel = ({
   const navigate = useNavigate();
 
   return (
-    <div className="bg-[#1e293b] border border-white/10 rounded-xl p-4 md:p-5 text-white">
-
+    <div className="w-full min-w-0 bg-[#1e293b] border border-white/10 rounded-xl p-3 sm:p-4 lg:p-5 text-white">
       {/* 🔥 TITLE + BACK BUTTON SAME LINE */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">
+      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">        <h2 className="text-lg font-semibold">
           Action Panel
         </h2>
 

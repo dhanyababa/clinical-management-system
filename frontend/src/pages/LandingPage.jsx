@@ -1,46 +1,3 @@
-// import React from "react";
-// import Navbar from "../components/layout/Navbar";
-// import Footer from "../components/layout/Footer";
-
-// import HeroSection from "../components/shared/HeroSection";
-// import StatsSection from "../components/shared/StatsSection";
-// import AboutSection from "../components/shared/AboutSection";
-// import SpecialitiesSection from "../components/shared/SpecialitiesSection";
-// import EmergencySection from "../components/shared/EmergencySection";
-// import HomeCareSection from "../components/shared/HomeCareSection";
-// import ChairmanSection from "../components/shared/ChairmanSection";
-// import SupportSection from "../components/shared/SupportSection";
-
-// const Home = () => {
-//   return (
-//     <div className="min-h-screen flex flex-col">
-
-//       {/* Navbar */}
-//       <Navbar />
-
-//       {/* Main Content */}
-//       <div className="flex-grow">
-
-//         <HeroSection />
-//         <StatsSection />
-//         <AboutSection />
-//         <SpecialitiesSection />
-//         <EmergencySection />
-//         <HomeCareSection />
-//         <ChairmanSection />
-//         <SupportSection />
-
-//       </div>
-
-//       {/* Footer */}
-//       <Footer />
-
-//     </div>
-//   );
-// };
-
-// export default Home;
-
 import Navbar from "../components/layout/Navbar";
 import Footer from "../components/layout/Footer";
 
@@ -57,21 +14,25 @@ import EmergencyFloat from "../components/shared/EmergencyFloat";
 
 const LandingPage = () => {
   return (
-    <>
+    <div className="flex min-h-screen min-w-0 flex-col overflow-x-clip bg-white">
       <Navbar />
-      <HeroSection />
-      <AboutSection />
-      <StatsSection />
-      <ChairmanSection />
-      <SpecialitiesSection />
-      
-      <DoctorsSection />
-      <FacilitiesSection />
-      <TestimonialsSection />
-      <AppointmentSection />
+
+      {/* Offset for fixed navbar */}
+      <main className="min-w-0 flex-1 pt-[76px] sm:pt-[88px] lg:pt-[124px]">
+        <HeroSection />
+        <AboutSection />
+        <StatsSection />
+        <ChairmanSection />
+        <SpecialitiesSection />
+        <DoctorsSection />
+        <FacilitiesSection />
+        <TestimonialsSection />
+        <AppointmentSection />
+      </main>
+
       <Footer />
       <EmergencyFloat />
-    </>
+    </div>
   );
 };
 

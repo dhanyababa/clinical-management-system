@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DoctorLayout from "../components/DoctorLayout";
@@ -5,20 +6,27 @@ import { getTodayAppointments } from "../api/doctorApi";
 import { useAuth } from "../../../context/AuthContext";
 
 const StatCard = ({ label, value, color }) => (
-  <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5 text-center">
-    <p className={`text-3xl font-bold ${color}`}>{value}</p>
-    <p className="text-xs text-gray-500 mt-1">{label}</p>
+  <div className="min-w-0 bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-4 sm:p-5 text-center">
+    <p className={`text-2xl sm:text-3xl font-bold ${color}`}>
+      {value}
+    </p>
+    <p className="text-xs text-gray-400 mt-1">{label}</p>
   </div>
 );
 
 const StatusBadge = ({ status }) => {
-  const cls = {
-    Scheduled: "bg-blue-400/10 text-blue-400 border-blue-400/30",
-    Completed: "bg-green-400/10 text-green-400 border-green-400/30",
-    Cancelled: "bg-red-400/10 text-red-400 border-red-400/30",
-  }[status] || "bg-gray-400/10 text-gray-400 border-gray-400/30";
+  const cls =
+    {
+      Scheduled: "bg-blue-400/10 text-blue-400 border-blue-400/30",
+      Completed: "bg-green-400/10 text-green-400 border-green-400/30",
+      Cancelled: "bg-red-400/10 text-red-400 border-red-400/30",
+    }[status] ||
+    "bg-gray-400/10 text-gray-400 border-gray-400/30";
+
   return (
-    <span className={`text-xs font-medium px-2 py-1 rounded border ${cls}`}>
+    <span
+      className={`inline-flex whitespace-nowrap text-xs font-medium px-2 py-1 rounded border ${cls}`}
+    >
       {status}
     </span>
   );
@@ -27,6 +35,7 @@ const StatusBadge = ({ status }) => {
 const DoctorDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,9 +49,15 @@ const DoctorDashboard = () => {
 
   const stats = {
     total: appointments.length,
-    completed: appointments.filter((a) => a.status === "Completed").length,
-    scheduled: appointments.filter((a) => a.status === "Scheduled").length,
-    cancelled: appointments.filter((a) => a.status === "Cancelled").length,
+    completed: appointments.filter(
+      (a) => a.status === "Completed"
+    ).length,
+    scheduled: appointments.filter(
+      (a) => a.status === "Scheduled"
+    ).length,
+    cancelled: appointments.filter(
+      (a) => a.status === "Cancelled"
+    ).length,
   };
 
   const doctorName = user?.first_name
@@ -51,120 +66,201 @@ const DoctorDashboard = () => {
 
   return (
     <DoctorLayout title="Dashboard">
-      {/* Welcome */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white">
-          Welcome, <span className="text-blue-400">Dr. {doctorName}</span> 👨‍⚕️
-        </h2>
-        <p className="text-gray-400 text-sm mt-1">
-          {new Date().toLocaleDateString("en-IN", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </p>
-      </div>
+      <div className="w-full min-w-0 max-w-full">
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total Today" value={loading ? "—" : stats.total} color="text-white" />
-        <StatCard label="Scheduled" value={loading ? "—" : stats.scheduled} color="text-blue-400" />
-        <StatCard label="Completed" value={loading ? "—" : stats.completed} color="text-green-400" />
-        <StatCard label="Cancelled" value={loading ? "—" : stats.cancelled} color="text-red-400" />
-      </div>
+        {/* Welcome */}
+        <div className="mb-5 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white leading-snug break-words">
+            Welcome,{" "}
+            <span className="text-blue-400">
+              Dr. {doctorName}
+            </span>{" "}
+            👨‍⚕️
+          </h2>
 
-      {error && (
-        <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
-          {error}
+          <p className="text-gray-400 text-xs sm:text-sm mt-2">
+            {new Date().toLocaleDateString("en-IN", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </p>
         </div>
-      )}
 
-      {/* Appointments Table */}
-      <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#1e2d4a]">
-          <h3 className="text-sm font-semibold text-white">Today's Patient Queue</h3>
+        {/* Statistics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <StatCard
+            label="Total Today"
+            value={loading ? "—" : stats.total}
+            color="text-white"
+          />
+
+          <StatCard
+            label="Scheduled"
+            value={loading ? "—" : stats.scheduled}
+            color="text-blue-400"
+          />
+
+          <StatCard
+            label="Completed"
+            value={loading ? "—" : stats.completed}
+            color="text-green-400"
+          />
+
+          <StatCard
+            label="Cancelled"
+            value={loading ? "—" : stats.cancelled}
+            color="text-red-400"
+          />
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#1e2d4a] text-gray-500 text-xs uppercase tracking-wider">
-                <th className="px-4 py-3 text-left">Token</th>
-                <th className="px-4 py-3 text-left">Patient</th>
-                <th className="px-4 py-3 text-left">Time</th>
-                <th className="px-4 py-3 text-left">Reason</th>
-                <th className="px-4 py-3 text-left">Status</th>
-                <th className="px-4 py-3 text-left">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                [...Array(4)].map((_, i) => (
-                  <tr key={i} className="border-b border-[#1e2d4a]">
-                    {[...Array(6)].map((_, j) => (
-                      <td key={j} className="px-4 py-3">
-                        <div className="h-3 bg-[#1e2d4a] rounded animate-pulse w-20" />
-                      </td>
-                    ))}
-                  </tr>
-                ))
-              ) : appointments.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="text-center text-gray-500 py-12 text-sm">
-                    No appointments scheduled for today.
-                  </td>
+
+        {error && (
+          <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
+
+        {/* Patient Queue */}
+        <section className="w-full min-w-0 max-w-full bg-[#0d1629] border border-[#1e2d4a] rounded-xl overflow-hidden">
+
+          <div className="px-4 sm:px-5 py-4 border-b border-[#1e2d4a]">
+            <h3 className="text-sm font-semibold text-white">
+              Today's Patient Queue
+            </h3>
+            <p className="text-xs text-gray-400 mt-1 sm:hidden">
+              Swipe sideways to view all columns
+            </p>
+          </div>
+
+          <div
+            className="w-full min-w-0 overflow-x-auto overscroll-x-contain"
+            role="region"
+            aria-label="Today's patient appointments"
+            tabIndex={0}
+          >
+            <table className="w-full min-w-[760px] text-sm">
+              <thead>
+                <tr className="border-b border-[#1e2d4a] text-gray-400 text-xs uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left whitespace-nowrap">
+                    Token
+                  </th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">
+                    Patient
+                  </th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">
+                    Time
+                  </th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">
+                    Reason
+                  </th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left whitespace-nowrap">
+                    Action
+                  </th>
                 </tr>
-              ) : (
-                appointments.map((appt) => (
-                  <tr
-                    key={appt.appointment_id}
-                    className="border-b border-[#1e2d4a] hover:bg-[#111d35] transition-colors"
-                  >
-                    <td className="px-4 py-3">
-                      <span className="text-lg font-bold text-blue-400">
-                        #{appt.token_number}
-                      </span>
+              </thead>
+
+              <tbody>
+                {loading ? (
+                  [...Array(4)].map((_, i) => (
+                    <tr
+                      key={i}
+                      className="border-b border-[#1e2d4a]"
+                    >
+                      {[...Array(6)].map((_, j) => (
+                        <td key={j} className="px-4 py-3">
+                          <div className="h-3 bg-[#1e2d4a] rounded animate-pulse w-20" />
+                        </td>
+                      ))}
+                    </tr>
+                  ))
+                ) : appointments.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={6}
+                      className="text-center text-gray-500 py-12 text-sm"
+                    >
+                      No appointments scheduled for today.
                     </td>
-                    <td className="px-4 py-3">
-                      <div>
+                  </tr>
+                ) : (
+                  appointments.map((appt) => (
+                    <tr
+                      key={appt.appointment_id}
+                      className="border-b border-[#1e2d4a] hover:bg-[#111d35] transition-colors"
+                    >
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <span className="text-lg font-bold text-blue-400">
+                          #{appt.token_number}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3 min-w-[150px]">
                         <p className="text-white font-medium">
                           {appt.patient
                             ? `${appt.patient.first_name} ${appt.patient.last_name}`.trim()
                             : `Patient #${appt.patient_id}`}
                         </p>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-400 font-mono text-xs">
-                      {appt.appointment_time}
-                    </td>
-                    <td className="px-4 py-3 text-gray-400 max-w-xs truncate">
-                      {appt.reason}
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge status={appt.status} />
-                    </td>
-                    <td className="px-4 py-3">
-                      {appt.status !== "Cancelled" && (
-                        <button
-                          onClick={() =>
-                            navigate(`/doctor/consultation/${appt.appointment_id}`)
-                          }
-                          className="text-xs text-blue-400 hover:text-blue-300 border border-blue-400/30 px-3 py-1.5 rounded-lg transition flex items-center gap-1"
+                      </td>
+
+                      <td className="px-4 py-3 text-gray-400 font-mono text-xs whitespace-nowrap">
+                        {appt.appointment_time}
+                      </td>
+
+                      <td className="px-4 py-3 text-gray-400 max-w-[220px]">
+                        <span
+                          className="block truncate"
+                          title={appt.reason || ""}
                         >
-                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-3 h-3">
-                            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
-                            <rect x="9" y="3" width="6" height="4" rx="1" />
-                          </svg>
-                          Consult
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                          {appt.reason}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <StatusBadge status={appt.status} />
+                      </td>
+
+                      <td className="px-4 py-3">
+                        {appt.status !== "Cancelled" && (
+                          <button
+                            type="button"
+                            onClick={() =>
+                              navigate(
+                                `/doctor/consultation/${appt.appointment_id}`
+                              )
+                            }
+                            className="text-xs text-blue-400 hover:text-blue-300 border border-blue-400/30 px-3 py-2 rounded-lg transition inline-flex items-center gap-1 whitespace-nowrap"
+                          >
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="w-3 h-3"
+                            >
+                              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2" />
+                              <rect
+                                x="9"
+                                y="3"
+                                width="6"
+                                height="4"
+                                rx="1"
+                              />
+                            </svg>
+                            Consult
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </DoctorLayout>
   );

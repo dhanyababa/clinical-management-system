@@ -1,120 +1,210 @@
-
-
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { HiMenu, HiX } from "react-icons/hi";
 import { MdPhoneInTalk, MdLogin } from "react-icons/md";
 
+const NAV_ITEMS = [
+  "About",
+  "Specialities",
+  "Doctors",
+  "Facilities",
+  "Testimonials",
+  "Contact",
+];
+
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
-  const toggleMenu = () => setMenuOpen(!menuOpen);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Close menu when the route changes
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  const handleLogin = () => {
+    setMenuOpen(false);
+    navigate("/login");
+  };
+
+  const handleNavigation = (item) => {
+    setMenuOpen(false);
+
+    const sectionId = item.toLowerCase();
+
+    if (location.pathname !== "/") {
+      navigate(`/#${sectionId}`);
+    } else {
+      const section = document.getElementById(sectionId);
+
+      if (section) {
+        section.scrollIntoView({
+          behavior: "smooth",
+        });
+      } else {
+        window.location.hash = sectionId;
+      }
+    }
+  };
 
   return (
-    <nav className="fixed w-full bg-white shadow-lg z-50 border-b-[3px] border-[#D4AF37]/30 font-poppins">
+    <nav className="fixed left-0 top-0 z-50 w-full border-b-[3px] border-[#D4AF37]/30 bg-white font-poppins shadow-lg">
 
-      {/* Top Contact Bar */}
-      <div className="hidden lg:flex justify-end bg-[#1B4360] text-white py-2 px-4 lg:px-6 text-[12px] font-bold uppercase tracking-wide space-x-6">
-        <div className="flex items-center space-x-1 transform hover:scale-105 transition-transform duration-300 ease-in-out cursor-pointer">
-          <MdPhoneInTalk className="text-[#D4AF37] text-lg" />
+      {/* ===================================== */}
+      {/* TOP CONTACT BAR */}
+      {/* ===================================== */}
+
+      <div className="hidden items-center justify-end bg-[#1B4360] px-6 py-2 text-xs font-bold uppercase tracking-wide text-white lg:flex">
+        <div className="flex items-center gap-2">
+          <MdPhoneInTalk className="text-lg text-[#D4AF37]" />
           <span>Emergency: +91 000 000 0000</span>
         </div>
       </div>
 
-      {/* Main Navbar */}
-      <div className="relative max-w-7xl mx-auto flex items-center py-2 lg:py-5 px-4 md:px-6">
+      {/* ===================================== */}
+      {/* MAIN NAVBAR */}
+      {/* ===================================== */}
 
-        {/* Logo */}
-        <div
-          onClick={() => navigate("/")}
-          className="flex items-center space-x-3 md:space-x-4 cursor-pointer transform hover:scale-105 transition-transform duration-300 ease-in-out flex-[0_0_30%]"
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-3 py-3 sm:gap-4 sm:px-6 lg:py-4">
+
+        {/* LOGO */}
+
+        <button
+          type="button"
+          onClick={() => {
+            setMenuOpen(false);
+            navigate("/");
+          }}
+          className="flex min-w-0 shrink-0 items-center gap-2 text-left sm:gap-3"
+          aria-label="MediCare+ Home"
         >
           <img
             src="https://img.icons8.com/ios-filled/80/1B4360/hospital-room.png"
-            alt="Hospital Logo"
-            className="h-12 md:h-14 w-12 md:w-14 rounded-full border-2 border-[#D4AF37] object-contain shadow-md"
+            alt="MediCare+ Hospital Logo"
+            className="h-10 w-10 shrink-0 rounded-full border-2 border-[#D4AF37] object-contain shadow-md sm:h-12 sm:w-12 lg:h-14 lg:w-14"
           />
-          <div className="flex flex-col">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-[#1B4360]">
+
+          <div className="flex min-w-0 flex-col">
+            <h1 className="whitespace-nowrap text-lg font-extrabold tracking-tight text-[#1B4360] sm:text-2xl lg:text-3xl">
               MediCare+
             </h1>
-            <p
-              className="text-[9px] sm:text-[10px] md:text-[12px] font-bold uppercase tracking-[0.25em]"
-              style={{ color: "#D4AF37" }}
-            >
+
+            <p className="whitespace-nowrap text-[7px] font-bold uppercase tracking-[0.12em] text-[#D4AF37] sm:text-[10px] sm:tracking-[0.2em]">
               Hospital & Research
             </p>
           </div>
-        </div>
+        </button>
 
-        {/* Desktop Menu */}
-        <div className="hidden md:flex justify-center flex-[1] space-x-7 lg:space-x-7.5 font-semibold text-sm md:text-base lg:text-lg uppercase tracking-wide text-[#1B4360] pr-10">
-          {["About", "Specialities", "Doctors", "Facilities", "Testimonials", "Contact"].map((item) => (
-            <a
+        {/* ===================================== */}
+        {/* DESKTOP NAVIGATION */}
+        {/* ===================================== */}
+
+        <div className="hidden min-w-0 flex-1 items-center justify-center gap-3 xl:flex 2xl:gap-6">
+          {NAV_ITEMS.map((item) => (
+            <button
               key={item}
-              href={`#${item.toLowerCase()}`}
-              className="relative group transform hover:-translate-y-1 hover:text-[#D4AF37] transition-all duration-300 ease-in-out"
+              type="button"
+              onClick={() => handleNavigation(item)}
+              className="group relative whitespace-nowrap text-xs font-semibold uppercase tracking-wide text-[#1B4360] transition-colors duration-200 hover:text-[#D4AF37] 2xl:text-sm"
             >
               {item}
-              <span className="absolute -bottom-1 left-0 w-0 h-1.5 bg-[#D4AF37] rounded-full transition-all duration-500 group-hover:w-full"></span>
-            </a>
+
+              <span className="absolute -bottom-2 left-0 h-[3px] w-0 rounded-full bg-[#D4AF37] transition-all duration-300 group-hover:w-full" />
+            </button>
           ))}
         </div>
 
-        {/* Login Button (Desktop) */}
-        <div className="hidden md:flex flex-[0_0_30%] justify-end">
+        {/* ===================================== */}
+        {/* DESKTOP STAFF LOGIN */}
+        {/* ===================================== */}
+
+        <button
+          type="button"
+          onClick={handleLogin}
+          className="hidden shrink-0 items-center justify-center gap-2 rounded-lg bg-[#1B4360] px-5 py-3 text-sm font-bold text-white shadow-md transition-all duration-200 hover:bg-[#285a7d] hover:shadow-lg xl:inline-flex"
+        >
+          <MdLogin size={21} className="text-[#D4AF37]" />
+          <span className="whitespace-nowrap">
+            Staff Login
+          </span>
+        </button>
+
+        {/* ===================================== */}
+        {/* TABLET STAFF LOGIN */}
+        {/* ===================================== */}
+
+        <div className="ml-auto hidden items-center gap-3 md:flex xl:hidden">
           <button
-            onClick={() => navigate("/login")}
-            className="flex items-center justify-center px-6 py-2 rounded-md font-bold text-sm uppercase tracking-wide shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 ease-in-out"
-            style={{ backgroundColor: "#1B4360", color: "#D4AF37", minWidth: "150px" }}
+            type="button"
+            onClick={handleLogin}
+            className="inline-flex shrink-0 items-center justify-center gap-2 rounded-lg bg-[#1B4360] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#285a7d]"
           >
-            <MdLogin className="mr-2 text-lg" /> Login
+            <MdLogin size={20} className="text-[#D4AF37]" />
+            <span className="whitespace-nowrap">
+              Staff Login
+            </span>
           </button>
         </div>
 
-        {/* Mobile Hamburger */}
-        <div className="md:hidden">
-          <button
-            onClick={toggleMenu}
-            className="p-2 text-[#1B4360] hover:text-[#D4AF37] transition-colors duration-300 ease-in-out"
-          >
-            {menuOpen ? <HiX size={28} /> : <HiMenu size={24} />}
-          </button>
-        </div>
+        {/* ===================================== */}
+        {/* MOBILE / TABLET MENU BUTTON */}
+        {/* ===================================== */}
+
+        <button
+          type="button"
+          onClick={() => setMenuOpen((prev) => !prev)}
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-[#1B4360] transition-colors hover:bg-gray-100 xl:hidden"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          aria-controls="medicare-navigation-menu"
+        >
+          {menuOpen ? (
+            <HiX size={28} />
+          ) : (
+            <HiMenu size={28} />
+          )}
+        </button>
       </div>
 
-      {/* Mobile Menu */}
-      {menuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 shadow-2xl animate-slide-down flex flex-col gap-2">
-          {["About", "Specialities", "Doctors", "Facilities", "Testimonials", "Contact"].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onClick={toggleMenu}
-              className="block px-6 py-5 border-b border-gray-50 text-[#1B4360] font-bold uppercase tracking-wide text-base sm:text-lg hover:bg-[#F1D279]/20 transform hover:scale-105 transition-all duration-300 ease-in-out"
-            >
-              {item}
-            </a>
-          ))}
+      {/* ===================================== */}
+      {/* MOBILE / TABLET NAVIGATION MENU */}
+      {/* ===================================== */}
 
-          {/* Mobile Login */}
-          <button
-            onClick={() => {
-              toggleMenu();
-              navigate("/login");
-            }}
-            className="w-full flex justify-center items-center py-3 font-bold uppercase tracking-wide text-base sm:text-lg transform hover:scale-105 transition-all duration-300 ease-in-out"
-            style={{ backgroundColor: "#1B4360", color: "#D4AF37" }}
-          >
-            <MdLogin className="mr-2 text-base sm:text-lg" /> Login
-          </button>
+      {menuOpen && (
+        <div
+          id="medicare-navigation-menu"
+          className="max-h-[calc(100dvh-85px)] overflow-y-auto border-t border-gray-200 bg-white shadow-xl xl:hidden"
+        >
+          <div className="mx-auto flex w-full max-w-7xl flex-col py-2">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item}
+                type="button"
+                onClick={() => handleNavigation(item)}
+                className="w-full px-6 py-3.5 text-left text-sm font-semibold uppercase tracking-wide text-[#1B4360] transition-colors hover:bg-[#D4AF37]/10 hover:text-[#1B4360]"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+
+          {/* Login inside menu only on mobile */}
+
+          <div className="border-t border-gray-100 px-4 pb-4 pt-3 md:hidden">
+            <button
+              type="button"
+              onClick={handleLogin}
+              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#1B4360] py-3 font-bold text-white shadow-md transition-colors hover:bg-[#285a7d]"
+            >
+              <MdLogin size={22} className="text-[#D4AF37]" />
+              Staff Login
+            </button>
+          </div>
         </div>
       )}
     </nav>
   );
 };
-// 
+
 export default Navbar;
-
-

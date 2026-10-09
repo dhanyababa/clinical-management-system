@@ -28,8 +28,7 @@ const CurrentConsultation = ({ consultation }) => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#1e293b] border border-white/10 rounded-xl p-4 md:p-5 text-white">
-
+      <div className="w-full min-w-0 h-full flex flex-col bg-[#1e293b] border border-white/10 rounded-xl p-3 sm:p-4 lg:p-5 text-white">
       {/* Title */}
       <h2 className="text-lg font-semibold mb-4">
         Current Consultation
@@ -42,12 +41,11 @@ const CurrentConsultation = ({ consultation }) => {
             No consultation added yet
           </div>
         ) : (
-          <div className="flex flex-col gap-3 text-sm md:text-base">
-
+            <div className="flex flex-col gap-3 text-sm sm:text-base min-w-0">
             {/* Symptoms */}
             <div className="bg-white/10 rounded-md p-3">
               <span className="text-gray-400">Symptoms: </span>
-              <span className="text-blue-300">
+              <span className="text-blue-300 break-words">
                 {consultation.symptoms}
               </span>
             </div>
@@ -55,7 +53,7 @@ const CurrentConsultation = ({ consultation }) => {
             {/* Diagnosis */}
             <div className="bg-white/10 rounded-md p-3">
               <span className="text-gray-400">Diagnosis: </span>
-              <span className="text-blue-300">
+              <span className="text-blue-300 break-words">
                 {consultation.diagnosis}
               </span>
             </div>
@@ -64,8 +62,7 @@ const CurrentConsultation = ({ consultation }) => {
             <div className="bg-white/10 rounded-md p-3">
               <p className="text-gray-400 mb-2">Vitals:</p>
 
-              <div className="grid grid-cols-2 gap-2 text-sm">
-
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
                 {formatVitals(consultation.vitals).map((item, index) => {
                   const [label, value] = item
                     .split(":")
@@ -90,7 +87,7 @@ const CurrentConsultation = ({ consultation }) => {
             {/* Advice */}
             <div className="bg-white/10 rounded-md p-3">
               <span className="text-gray-400">Advice: </span>
-              <span className="text-blue-300">
+              <span className="text-blue-300 break-words">
                 {consultation.advice || "N/A"}
               </span>
             </div>

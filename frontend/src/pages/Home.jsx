@@ -13,14 +13,11 @@ import SupportSection from "../components/shared/SupportSection";
 
 const Home = () => {
   return (
-    <div className="min-h-screen flex flex-col">
-
-      {/* Navbar */}
+    <div className="flex min-h-screen min-w-0 flex-col overflow-x-clip bg-white">
       <Navbar />
 
       {/* Main Content */}
-      <div className="flex-grow">
-
+      <main className="min-w-0 flex-1 pt-[76px] sm:pt-[88px] lg:pt-[124px]">
         <HeroSection />
         <StatsSection />
         <AboutSection />
@@ -29,12 +26,9 @@ const Home = () => {
         <HomeCareSection />
         <ChairmanSection />
         <SupportSection />
+      </main>
 
-      </div>
-
-      {/* Footer */}
       <Footer />
-
     </div>
   );
 };

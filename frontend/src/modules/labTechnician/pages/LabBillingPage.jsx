@@ -416,31 +416,31 @@ const LabBillingPage = () => {
     .filter((b) => b.payment_status === "Pending")
     .reduce((sum, b) => sum + parseFloat(b.final_amount || 0), 0);
 
-  const inp = "w-full bg-[#060d1a] border border-[#1e2d4a] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-cyan-400 transition";
+  const inp = "w-full min-w-0 bg-[#060d1a] border border-[#1e2d4a] rounded-lg px-3 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-400 transition";
 
   return (
     <LabLayout title="Lab Billing">
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5">
+      <div className="grid grid-cols-1 min-[400px]:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="min-w-0 bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-3 sm:p-5">
           <p className="text-2xl font-bold text-cyan-400">{bills.length}</p>
           <p className="text-xs text-gray-500 mt-1">Total Bills</p>
         </div>
-        <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5">
+        <div className="min-w-0 bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-3 sm:p-5">
           <p className="text-2xl font-bold text-yellow-400">{bills.filter((b) => b.payment_status === "Pending").length}</p>
           <p className="text-xs text-gray-500 mt-1">Pending Payment</p>
         </div>
-        <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5">
+        <div className="min-w-0 bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-3 sm:p-5">
           <p className="text-2xl font-bold text-green-400">₹{totalRevenue.toFixed(2)}</p>
           <p className="text-xs text-gray-500 mt-1">Collected</p>
         </div>
-        <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5">
+        <div className="min-w-0 bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-3 sm:p-5">
           <p className="text-2xl font-bold text-orange-400">₹{pendingRevenue.toFixed(2)}</p>
           <p className="text-xs text-gray-500 mt-1">Pending Amount</p>
         </div>
       </div>
 
-      <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           {billableOrders.length > 0 && (
             <span className="text-xs text-yellow-400 bg-yellow-400/10 border border-yellow-400/30 px-3 py-1.5 rounded-lg">
@@ -449,15 +449,15 @@ const LabBillingPage = () => {
           )}
         </div>
         <button onClick={() => { cancelForm(); setShowForm((p) => !p); }}
-          className="text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 px-4 py-2 rounded-lg hover:bg-cyan-500/30 transition">
+          className="w-full sm:w-auto text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 px-4 py-2.5 rounded-lg hover:bg-cyan-500/30 transition">
           {showForm && !editTarget ? "Cancel" : "+ Create Bill"}
         </button>
       </div>
 
       {/* Form */}
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-5 mb-5 space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="min-w-0 bg-[#0d1629] border border-[#1e2d4a] rounded-xl p-3 sm:p-5 mb-5 space-y-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
             <div>
               <label className="text-xs text-gray-400 block mb-1">
                 Lab Order * {!editTarget && <span className="text-gray-600">(orders without a bill are shown)</span>}
@@ -514,11 +514,12 @@ const LabBillingPage = () => {
 
           {/* Test Items Breakdown */}
           {selectedOrderItems.length > 0 && (
-            <div className="bg-[#060d1a] border border-[#1e2d4a] rounded-xl overflow-hidden">
+            <div className="min-w-0 bg-[#060d1a] border border-[#1e2d4a] rounded-xl overflow-hidden">
               <div className="px-4 py-2.5 border-b border-[#1e2d4a] flex items-center gap-2">
                 <span className="text-xs font-semibold text-gray-300">🧪 Test Items Breakdown</span>
               </div>
-              <table className="w-full text-xs">
+              <div className="w-full overflow-x-auto">
+                <table className="w-full min-w-[360px] text-xs">
                 <thead>
                   <tr className="text-gray-500 border-b border-[#1e2d4a]">
                     <th className="px-4 py-2 text-left">Test Name</th>
@@ -543,13 +544,14 @@ const LabBillingPage = () => {
                     </td>
                   </tr>
                 </tbody>
-              </table>
-            </div>
+                </table>
+              </div>
+              </div>
           )}
 
           {/* Final amount preview */}
           {form.total_amount && (
-            <div className="bg-[#060d1a] border border-cyan-400/20 rounded-xl px-5 py-3 flex items-center justify-between">
+            <div className="bg-[#060d1a] border border-cyan-400/20 rounded-xl px-3 sm:px-5 py-3 flex flex-col min-[400px]:flex-row min-[400px]:items-center min-[400px]:justify-between gap-2">
               <span className="text-xs text-gray-400">Final Amount After Discount</span>
               <span className="text-cyan-400 font-bold text-lg">₹{finalAmt(form.total_amount, form.discount)}</span>
             </div>
@@ -557,11 +559,11 @@ const LabBillingPage = () => {
 
           {error && <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">{error}</div>}
 
-          <div className="flex justify-end gap-3">
+          <div className="flex flex-col min-[400px]:flex-row min-[400px]:justify-end gap-3">
             <button type="button" onClick={cancelForm}
-              className="text-sm text-gray-400 hover:text-white border border-[#1e2d4a] px-5 py-2 rounded-lg transition">Cancel</button>
+              className="w-full min-[400px]:w-auto text-sm text-gray-400 hover:text-white border border-[#1e2d4a] px-5 py-2.5 rounded-lg transition">Cancel</button>
             <button type="submit" disabled={submitting}
-              className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-sm px-6 py-2 rounded-lg transition disabled:opacity-50 flex items-center gap-2">
+              className="w-full min-[400px]:w-auto justify-center bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-sm px-6 py-2.5 rounded-lg transition disabled:opacity-50 flex items-center gap-2">
               {submitting && <span className="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin" />}
               {submitting ? "Saving…" : editTarget ? "Update Bill" : "Create Bill"}
             </button>
@@ -573,9 +575,9 @@ const LabBillingPage = () => {
       {!showForm && error && <div className="mb-4 bg-red-500/10 border border-red-500/30 text-red-400 text-sm px-4 py-3 rounded-lg">{error}</div>}
 
       {/* Bills table */}
-      <div className="bg-[#0d1629] border border-[#1e2d4a] rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
+      <div className="w-full min-w-0 bg-[#0d1629] border border-[#1e2d4a] rounded-xl overflow-hidden">
+        <div className="w-full max-w-full overflow-x-auto">
+          <table className="min-w-[1150px] w-full text-sm">
             <thead>
               <tr className="border-b border-[#1e2d4a] text-gray-500 text-xs uppercase tracking-wider">
                 <th className="px-4 py-3 text-left">Bill No.</th>
@@ -635,7 +637,7 @@ const LabBillingPage = () => {
                         }`}>{bill.payment_status}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex gap-2 flex-wrap">
+                        <div className="flex flex-wrap items-center gap-2 min-w-[220px]">
                           {bill.payment_status === "Pending" && (
                             <button onClick={() => markPaid(bill)}
                               className="text-xs text-green-400 hover:text-green-300 border border-green-400/30 px-3 py-1.5 rounded-lg transition">Mark Paid</button>

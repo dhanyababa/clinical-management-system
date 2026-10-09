@@ -22,8 +22,10 @@ from authentication.permissions import (
     IsPharmacist,
     IsLabTechnician,
 )
-
-
+from administration.services.role_api import RoleCreationMixin
+from administration.services.role_update_api import (
+    RoleUpdateMixin,
+)
 # ─── Pagination ──────────────────────────────────────────────────
 class StandardPagination(PageNumberPagination):
     page_size = 10
@@ -139,7 +141,9 @@ class StaffDetailView(RetrieveUpdateDeleteView):
 # GET list/detail: any authenticated user (receptionist needs the list for booking)
 # POST/PUT/PATCH/DELETE: admin only
 
-class DoctorListView(APIView):
+class DoctorListView(RoleCreationMixin, AdminOnlyView):
+    role_name = "Doctor"
+    serializer_class = DoctorProfileSerializer
     def get_permissions(self):
         if self.request.method == "GET":
             return [IsAuthenticated()]
@@ -153,15 +157,16 @@ class DoctorListView(APIView):
             DoctorProfileSerializer(page, many=True).data
         )
 
-    def post(self, request):
-        s = DoctorProfileSerializer(data=request.data)
-        if s.is_valid():
-            instance = s.save()
-            return Response({"id": instance.pk, "data": s.data}, status=status.HTTP_201_CREATED)
-        return Response({"errors": s.errors}, status=status.HTTP_400_BAD_REQUEST)
+    # def post(self, request):
+    #     s = DoctorProfileSerializer(data=request.data)
+    #     if s.is_valid():
+    #         instance = s.save()
+    #         return Response({"id": instance.pk, "data": s.data}, status=status.HTTP_201_CREATED)
+    #     return Response({"errors": s.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DoctorDetailView(APIView):
+class DoctorDetailView(RoleUpdateMixin,APIView):
+    serializer_class = DoctorProfileSerializer
     def get_permissions(self):
         if self.request.method == "GET":
             return [IsAuthenticated()]
@@ -173,19 +178,19 @@ class DoctorDetailView(APIView):
     def get(self, request, pk):
         return Response(DoctorProfileSerializer(self._obj(pk)).data)
 
-    def put(self, request, pk):
-        s = DoctorProfileSerializer(self._obj(pk), data=request.data)
-        if s.is_valid():
-            s.save()
-            return Response(s.data)
-        return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def put(self, request, pk):
+    #     s = DoctorProfileSerializer(self._obj(pk), data=request.data)
+    #     if s.is_valid():
+    #         s.save()
+    #         return Response(s.data)
+    #     return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def patch(self, request, pk):
-        s = DoctorProfileSerializer(self._obj(pk), data=request.data, partial=True)
-        if s.is_valid():
-            s.save()
-            return Response(s.data)
-        return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def patch(self, request, pk):
+    #     s = DoctorProfileSerializer(self._obj(pk), data=request.data, partial=True)
+    #     if s.is_valid():
+    #         s.save()
+    #         return Response(s.data)
+    #     return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
         self._obj(pk).delete()
@@ -193,34 +198,37 @@ class DoctorDetailView(APIView):
 
 
 # ─── Receptionists (admin only) ──────────────────────────────────
-class ReceptionistListView(ListCreateView):
+class ReceptionistListView(RoleCreationMixin,ListCreateView):
+    role_name = "Receptionist"
     model = ReceptionistProfile
     serializer_class = ReceptionistProfileSerializer
     order_field = "profile_id"  # FIX: PK is profile_id, not id — base default caused FieldError
 
 
-class ReceptionistDetailView(RetrieveUpdateDeleteView):
+class ReceptionistDetailView(RoleUpdateMixin,RetrieveUpdateDeleteView):
     serializer_class = ReceptionistProfileSerializer
 
 
 # ─── Lab Technicians (admin only) ────────────────────────────────
-class LabTechnicianListView(ListCreateView):
+class LabTechnicianListView(RoleCreationMixin,ListCreateView):
+    role_name = "Lab Technician"
     model = LabTechnicianProfile
     serializer_class = LabTechnicianProfileSerializer
     order_field = "profile_id"  # FIX: PK is profile_id, not id — base default caused FieldError
 
 
-class LabTechnicianDetailView(RetrieveUpdateDeleteView):
+class LabTechnicianDetailView(RoleUpdateMixin,RetrieveUpdateDeleteView):
     serializer_class = LabTechnicianProfileSerializer
 
 
 # ─── Pharmacists (admin only) ────────────────────────────────────
-class PharmacistListView(ListCreateView):
+class PharmacistListView(RoleCreationMixin,ListCreateView):
+    role_name = "Pharmacist"
     model = PharmacistProfile
     serializer_class = PharmacistProfileSerializer
 
 
-class PharmacistDetailView(RetrieveUpdateDeleteView):
+class PharmacistDetailView(RoleUpdateMixin,RetrieveUpdateDeleteView):
     serializer_class = PharmacistProfileSerializer
 
 
