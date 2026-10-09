@@ -20,6 +20,13 @@ COOKIE_OPTS = dict(
     secure=not settings.DEBUG,
     samesite="None" if not settings.DEBUG else "Lax",
 )
+print(
+    "AUTH COOKIE CONFIG:",
+    "DEBUG =", settings.DEBUG,
+    "SECURE =", COOKIE_OPTS["secure"],
+    "SAMESITE =", COOKIE_OPTS["samesite"],
+    flush=True,
+)
 # Set secure=True in production (HTTPS). False here for local dev.
 
 # FIX 3: Lifetimes must match SIMPLE_JWT settings exactly.
