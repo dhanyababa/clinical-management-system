@@ -6,10 +6,20 @@ from django.core.exceptions import ValidationError
 
 
 def calculate_age(dob):
-    today = timezone.now().date()
-    return (today - dob).days // 365 if dob else 0
+    if not dob:
+        return 0
 
+    today = timezone.localdate()
 
+    age = today.year - dob.year
+
+    if (today.month, today.day) < (dob.month, dob.day):
+        age -= 1
+
+    return age
+
+def current_local_date():
+    return timezone.localdate()
 # ─────────────────────────────────────────────
 # Staff Profile
 # ─────────────────────────────────────────────
@@ -36,37 +46,56 @@ class StaffProfile(models.Model):
     address = models.TextField(blank=True, null=True)
     qualification = models.CharField(max_length=255, default="Not Specified")
     salary = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=10000)
-    joining_date = models.DateField(default=timezone.now)
+    joining_date = models.DateField(default=current_local_date)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         # Only validate fields that are set
+        today = timezone.localdate()
+
         if self.date_of_birth:
-            today = timezone.now().date()
             if self.date_of_birth > today:
-                raise ValidationError({"date_of_birth": "DOB cannot be in the future."})
+                raise ValidationError({
+                    "date_of_birth": "DOB cannot be in the future."
+                })
+
             role_min_age = {
-                "Doctor": 25, "Receptionist": 21,
-                "Lab Technician": 22, "Pharmacist": 23, "Admin": 21,
+                "Doctor": 25,
+                "Receptionist": 21,
+                "Lab Technician": 22,
+                "Pharmacist": 23,
+                "Admin": 21,
             }
+
             if self.role:
                 age = calculate_age(self.date_of_birth)
                 min_age = role_min_age.get(self.role, 21)
+
                 if age < min_age:
                     raise ValidationError({
-                        "date_of_birth": f"{self.role} must be at least {min_age} years old."
+                        "date_of_birth": (
+                            f"{self.role} must be at least "
+                            f"{min_age} years old."
+                        )
                     })
 
         if self.salary is not None:
             if self.salary <= 0:
-                raise ValidationError({"salary": "Salary must be positive."})
-            if self.salary > 1_000_000:
-                raise ValidationError({"salary": "Salary exceeds the allowed limit."})
+                raise ValidationError({
+                    "salary": "Salary must be positive."
+                })
 
-        if self.joining_date and self.joining_date > timezone.now().date():
-            raise ValidationError({"joining_date": "Joining date cannot be in the future."})
+            if self.salary > 1_000_000:
+                raise ValidationError({
+                    "salary": "Salary exceeds the allowed limit."
+                })
+
+        if self.joining_date and self.joining_date > today:
+            raise ValidationError({
+                "joining_date": "Joining date cannot be in the future."
+            })
 
     def save(self, *args, **kwargs):
         self.full_clean()
